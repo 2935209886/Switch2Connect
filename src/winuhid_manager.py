@@ -11,6 +11,7 @@ import os
 import sys
 import tkinter as tk
 from tkinter import messagebox
+from ui_zh_cn import tr
 from ctypes import wintypes
 
 from driver_install_helper import (
@@ -105,7 +106,7 @@ def launch_elevated(script_path):
 class WinUHidManager:
     def __init__(self, root):
         self.root = root
-        self.root.title("WinUHid Driver Manager")
+        self.root.title(tr("WinUHid Driver Manager"))
         self.root.config(bg=POPUP_BACKGROUND)
         self.root.tk.call("tk", "scaling", 1.3333333333333333)
         center_window(self.root, 450, 180)
@@ -113,13 +114,13 @@ class WinUHidManager:
         self.root.protocol("WM_DELETE_WINDOW", self.root.destroy)
 
         self.status_label = tk.Label(
-            root, text="", justify=tk.CENTER, anchor="center",
+            root, text=tr(""), justify=tk.CENTER, anchor="center",
             bg=POPUP_BACKGROUND, fg=POPUP_TEXT,
             font=scale_font(("Arial", 11, "bold")),
         )
         self.status_label.pack(fill=tk.X, padx=16, pady=(12, 4))
         self.details_label = tk.Label(
-            root, text="", justify=tk.CENTER, anchor="center",
+            root, text=tr(""), justify=tk.CENTER, anchor="center",
             wraplength=410, bg=POPUP_BACKGROUND, fg=POPUP_DETAILS,
             font=scale_font(("Arial", 9)),
         )
@@ -127,14 +128,14 @@ class WinUHidManager:
         button_frame = tk.Frame(root, bg=POPUP_BACKGROUND)
         button_frame.pack(pady=2)
         self.action_button = tk.Button(
-            button_frame, text="", width=22,
+            button_frame, text=tr(""), width=22,
             bg=POPUP_BUTTON, fg=POPUP_TEXT, activebackground=POPUP_BUTTON,
             activeforeground=POPUP_TEXT, bd=0, relief=tk.FLAT,
             font=scale_font(("Arial", 10, "bold")), command=self.on_action,
         )
         self.action_button.pack(side=tk.LEFT, padx=3)
         self.close_button = tk.Button(
-            button_frame, text="Close", width=10,
+            button_frame, text=tr("Close"), width=10,
             bg=POPUP_BUTTON, fg=POPUP_TEXT, activebackground=POPUP_BUTTON,
             activeforeground=POPUP_TEXT, bd=0, relief=tk.FLAT,
             font=scale_font(("Arial", 10, "bold")), command=self.root.destroy,
@@ -146,32 +147,32 @@ class WinUHidManager:
         status = get_winuhid_status(use_cache=False)
         self._status = status
         if status.state == WINUHID_HEALTHY:
-            self.status_label.config(text="WinUHid Driver: Installed and Ready")
-            self.action_button.config(text="Uninstall WinUHid Driver", state=tk.NORMAL)
+            self.status_label.config(text=tr("WinUHid Driver: Installed and Ready"))
+            self.action_button.config(text=tr("Uninstall WinUHid Driver"), state=tk.NORMAL)
         elif status.state == WINUHID_PARTIAL:
-            self.status_label.config(text="WinUHid Driver: Repair Required")
-            self.action_button.config(text="Repair WinUHid Driver", state=tk.NORMAL)
+            self.status_label.config(text=tr("WinUHid Driver: Repair Required"))
+            self.action_button.config(text=tr("Repair WinUHid Driver"), state=tk.NORMAL)
         else:
-            self.status_label.config(text="WinUHid Driver: Not Installed")
-            self.action_button.config(text="Install WinUHid Driver", state=tk.NORMAL)
-        self.details_label.config(text=status.describe() or "Administrator approval is required for driver changes.")
+            self.status_label.config(text=tr("WinUHid Driver: Not Installed"))
+            self.action_button.config(text=tr("Install WinUHid Driver"), state=tk.NORMAL)
+        self.details_label.config(text=tr(status.describe() or "Administrator approval is required for driver changes."))
 
     def on_action(self):
         status = self._status
         if status.state == WINUHID_HEALTHY:
             if not messagebox.askyesno(
-                "Uninstall WinUHid Driver",
-                "Uninstall WinUHid and remove its trusted driver certificate?\n\n"
-                "Administrator approval is required.", parent=self.root):
+                tr("Uninstall WinUHid Driver"),
+                tr("Uninstall WinUHid and remove its trusted driver certificate?\n\n"
+                "Administrator approval is required."), parent=self.root):
                 return
             script = driver_file("uninstall_driver.ps1")
             action = "uninstall"
         else:
             title = "Repair WinUHid Driver" if status.state == WINUHID_PARTIAL else "Install WinUHid Driver"
             if not messagebox.askyesno(
-                title,
-                "WinUHid will install a virtual HID driver and add its driver certificate "
-                "to the Windows trusted stores.\n\nAdministrator approval is required.\n\nContinue?",
+                tr(title),
+                tr("WinUHid will install a virtual HID driver and add its driver certificate "
+                "to the Windows trusted stores.\n\nAdministrator approval is required.\n\nContinue?"),
                 parent=self.root):
                 return
             script = driver_file("install_driver.ps1")
@@ -182,7 +183,7 @@ class WinUHidManager:
         self.action_button.config(state=tk.DISABLED)
         self.close_button.config(state=tk.DISABLED)
         self.progress_win = tk.Toplevel(self.root)
-        self.progress_win.title("Driver Installation" if action == "install" else "Driver Uninstallation")
+        self.progress_win.title(tr("Driver Installation" if action == "install" else "Driver Uninstallation"))
         self.progress_win.geometry("450x130")
         self.progress_win.resizable(False, False)
         self.progress_win.config(bg=POPUP_BACKGROUND)
@@ -191,8 +192,8 @@ class WinUHidManager:
         center_window(self.progress_win, 450, 130)
         tk.Label(
             self.progress_win,
-            text=("Installing" if action == "install" else "Uninstalling")
-                 + " WinUHid Driver...\nPlease authorize the UAC prompt if asked.",
+            text=tr(("Installing" if action == "install" else "Uninstalling")
+                 + " WinUHid Driver...\nPlease authorize the UAC prompt if asked."),
             fg=POPUP_TEXT, bg=POPUP_BACKGROUND,
             font=scale_font(("Arial", 11, "bold")),
         ).pack(pady=40)
@@ -232,13 +233,13 @@ class WinUHidManager:
         self.refresh()
         if success:
             messagebox.showinfo(
-                "Success",
-                "WinUHid driver " + ("installed" if action == "install" else "uninstalled")
-                + " successfully.", parent=self.root)
+                tr("Success"),
+                tr("WinUHid driver " + ("installed" if action == "install" else "uninstalled")
+                + " successfully."), parent=self.root)
         else:
             suffix = f"\n\nExit code: {exit_code}" if exit_code is not None else ""
-            messagebox.showerror("Error", "WinUHid operation failed." + suffix
-                                 + (f"\n\n{details}" if details else ""), parent=self.root)
+            messagebox.showerror(tr("Error"), tr("WinUHid operation failed." + suffix
+                                 + (f"\n\n{details}" if details else "")), parent=self.root)
 
 
 def main():

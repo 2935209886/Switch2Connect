@@ -1,5 +1,7 @@
 @echo off
 setlocal
+set "PYTHON_COMMAND=python"
+if exist "%~dp0.venv\Scripts\python.exe" set "PYTHON_COMMAND=%~dp0.venv\Scripts\python.exe"
 
 REM Build the standalone WinUHid Manager distributed with the GitHub Full Version.
 REM This package intentionally contains the WinUHid driver payload; it is never
@@ -33,7 +35,7 @@ if not exist "%DIST_DIR%" mkdir "%DIST_DIR%"
 if not exist "build" mkdir "build"
 
 echo Building %APP_NAME%.exe...
-python -m PyInstaller --noconsole --onefile --clean --paths src ^
+"%PYTHON_COMMAND%" -m PyInstaller --noconsole --onefile --clean --paths src ^
     --add-data "drivers\install_driver.ps1;drivers" ^
     --add-data "drivers\uninstall_driver.ps1;drivers" ^
     --add-data "drivers\WinUHidDriver.inf;drivers" ^

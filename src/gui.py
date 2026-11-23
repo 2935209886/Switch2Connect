@@ -37,6 +37,7 @@ import threading
 import weakref
 import tkinter as tk
 from tkinter import filedialog, ttk
+from ui_zh_cn import tr, LocalizedCombobox, LocalizedStringVar
 import tkinter.font as tkFont
 import yaml
 import logging
@@ -804,7 +805,7 @@ class Tooltip:
         except Exception:
             pass
         tk.Label(
-            tip, text=text, bg="#1E1E1E", fg="white",
+            tip, text=tr(text), bg="#1E1E1E", fg="white",
             font=scale_font(("Arial", 10, "bold")), justify=tk.LEFT,
             bd=1, relief=tk.SOLID, padx=int(6 * scaling_factor), pady=int(3 * scaling_factor),
         ).pack()
@@ -1325,7 +1326,7 @@ class BackButtonSelector(tk.Button):
         self._min_chars = max(1, self._fit_chars("Default"))
         super().__init__(
             parent,
-            text="Default",
+            text=tr("Default"),
             width=self._min_chars,
             font=self._font,
             bg=button_gray,
@@ -1348,15 +1349,15 @@ class BackButtonSelector(tk.Button):
         return self._value
 
     def display_label(self, value):
-        return self._display_overrides.get(value, back_button_label(value))
+        return tr(self._display_overrides.get(value, back_button_label(value)))
 
     def set(self, value):
         label = self.display_label(value)
         self._value = value
         if self._auto_fit:
-            self.config(text=label, width=max(self._min_chars, self._fit_chars(label)))
+            self.config(text=tr(label), width=max(self._min_chars, self._fit_chars(label)))
         else:
-            self.config(text=label)
+            self.config(text=tr(label))
 
     def select_value(self, value):
         # Picking an option in the popup updates the value and fires the same event the
@@ -1381,7 +1382,7 @@ class ToggleSwitch(tk.Frame):
             frame.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
             
             w = widths[i] if widths else 8
-            btn = tk.Button(frame, text=label, width=w, font=scale_font(("Arial", 11, "bold")),
+            btn = tk.Button(frame, text=tr(label), width=w, font=scale_font(("Arial", 11, "bold")),
                             bd=0, relief=tk.FLAT, highlightthickness=0,
                             command=lambda idx=i: self._on_click(idx))
             btn.pack(padx=0, pady=0) # Base state: no padding
@@ -1439,7 +1440,7 @@ class ToggleSwitch(tk.Frame):
             frame.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
             
             w = widths[i] if widths else 8
-            btn = tk.Button(frame, text=label, width=w, font=scale_font(("Arial", 11, "bold")),
+            btn = tk.Button(frame, text=tr(label), width=w, font=scale_font(("Arial", 11, "bold")),
                             bd=0, relief=tk.FLAT, highlightthickness=0,
                             command=lambda idx=i: self._on_click(idx))
             btn.pack(padx=0, pady=0) # Base state: no padding
@@ -1492,12 +1493,12 @@ class PlayerInfoBlock:
         if controller is None: return
         if not getattr(controller, 'is_mag_calibrating', False):
             controller.start_mag_calibration()
-            btn.config(text="Stop Cal", fg="white")
+            btn.config(text=tr("Stop Cal"), fg="white")
             frame.config(bg="#FF8C00")
             btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
         else:
             controller.stop_mag_calibration()
-            btn.config(text="Mag Cal", fg="white")
+            btn.config(text=tr("Mag Cal"), fg="white")
             frame.config(bg=button_gray)
             btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
@@ -1924,7 +1925,7 @@ class PlayerInfoBlock:
         self._update_controller_image()
 
         if not getattr(self, 'close_btn', None):
-            self.close_btn = tk.Button(self.controllers_frame, text="X", bg=block_color, fg="#FFFFFF", bd=0, 
+            self.close_btn = tk.Button(self.controllers_frame, text=tr("X"), bg=block_color, fg="#FFFFFF", bd=0,
                                        relief=tk.FLAT, highlightthickness=0,
                                        font=scale_font(("Arial", 14, "bold")), activebackground="#ff4444", activeforeground="white", 
                                        command=self._on_close_clicked)
@@ -1934,7 +1935,7 @@ class PlayerInfoBlock:
         if not getattr(self, 'joystick_cal_btn', None):
             self.joystick_cal_frame = tk.Frame(self.controllers_frame, bg=button_gray)
             self.joystick_cal_btn = tk.Button(
-                self.joystick_cal_frame, text="Joysticks Cal",
+                self.joystick_cal_frame, text=tr("Joysticks Cal"),
                 font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT,
                 highlightthickness=0, bg=button_gray, fg="white",
                 command=self._on_joystick_cal_clicked
@@ -1955,15 +1956,15 @@ class PlayerInfoBlock:
             if c is not None and getattr(c.controller_info, 'product_id', 0) != NSO_GAMECUBE_CONTROLLER_PID:
                 if not getattr(self, 'mag_btn_single', None):
                     self.mag_frame_single = tk.Frame(self.controllers_frame, bg=button_gray)
-                    self.mag_btn_single = tk.Button(self.mag_frame_single, text="Mag Cal", font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, highlightthickness=0,
+                    self.mag_btn_single = tk.Button(self.mag_frame_single, text=tr("Mag Cal"), font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, highlightthickness=0,
                                                     command=lambda: self._on_mag_clicked(self.get_single_controller(), self.mag_btn_single, self.mag_frame_single))
                     self.mag_btn_single.pack()
                 
                 if getattr(c, 'is_mag_calibrating', False):
-                    self.mag_btn_single.config(text="Stop Cal", bg=button_gray, fg="white")
+                    self.mag_btn_single.config(text=tr("Stop Cal"), bg=button_gray, fg="white")
                     self.mag_frame_single.config(bg="#FF8C00")
                 else:
-                    self.mag_btn_single.config(text="Mag Cal", bg=button_gray, fg="white")
+                    self.mag_btn_single.config(text=tr("Mag Cal"), bg=button_gray, fg="white")
                     self.mag_frame_single.config(bg=button_gray)
                 self.mag_btn_single.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
                 self.mag_frame_single.place(x=int(150 * scaling_factor), y=int(125 * scaling_factor))
@@ -1983,15 +1984,15 @@ class PlayerInfoBlock:
             if lc is not None:
                 if not getattr(self, 'mag_btn_l', None):
                     self.mag_frame_l = tk.Frame(self.controllers_frame, bg=button_gray)
-                    self.mag_btn_l = tk.Button(self.mag_frame_l, text="Mag Cal", font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, highlightthickness=0,
+                    self.mag_btn_l = tk.Button(self.mag_frame_l, text=tr("Mag Cal"), font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, highlightthickness=0,
                                                 command=lambda: self._on_mag_clicked(self.get_left_controller(), self.mag_btn_l, self.mag_frame_l))
                     self.mag_btn_l.pack()
                 
                 if getattr(lc, 'is_mag_calibrating', False):
-                    self.mag_btn_l.config(text="Stop Cal", bg=button_gray, fg="white")
+                    self.mag_btn_l.config(text=tr("Stop Cal"), bg=button_gray, fg="white")
                     self.mag_frame_l.config(bg="#FF8C00")
                 else:
-                    self.mag_btn_l.config(text="Mag Cal", bg=button_gray, fg="white")
+                    self.mag_btn_l.config(text=tr("Mag Cal"), bg=button_gray, fg="white")
                     self.mag_frame_l.config(bg=button_gray)
                 self.mag_btn_l.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
                 self.mag_frame_l.place(x=int(5 * scaling_factor), y=int(125 * scaling_factor))
@@ -2002,15 +2003,15 @@ class PlayerInfoBlock:
             if rc is not None:
                 if not getattr(self, 'mag_btn_r', None):
                     self.mag_frame_r = tk.Frame(self.controllers_frame, bg=button_gray)
-                    self.mag_btn_r = tk.Button(self.mag_frame_r, text="Mag Cal", font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, highlightthickness=0,
+                    self.mag_btn_r = tk.Button(self.mag_frame_r, text=tr("Mag Cal"), font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, highlightthickness=0,
                                                 command=lambda: self._on_mag_clicked(self.get_right_controller(), self.mag_btn_r, self.mag_frame_r))
                     self.mag_btn_r.pack()
                 
                 if getattr(rc, 'is_mag_calibrating', False):
-                    self.mag_btn_r.config(text="Stop Cal", bg=button_gray, fg="white")
+                    self.mag_btn_r.config(text=tr("Stop Cal"), bg=button_gray, fg="white")
                     self.mag_frame_r.config(bg="#FF8C00")
                 else:
-                    self.mag_btn_r.config(text="Mag Cal", bg=button_gray, fg="white")
+                    self.mag_btn_r.config(text=tr("Mag Cal"), bg=button_gray, fg="white")
                     self.mag_frame_r.config(bg=button_gray)
                 self.mag_btn_r.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
                 self.mag_frame_r.place(x=int(150 * scaling_factor), y=int(125 * scaling_factor))
@@ -2021,7 +2022,7 @@ class PlayerInfoBlock:
         if not virtualController.is_single():
             if not getattr(self, 'split_btn', None):
                 self.split_frame = tk.Frame(self.controllers_frame, bg=button_gray)
-                self.split_btn = tk.Button(self.split_frame, text="Split", bg=button_gray, fg="white", bd=0,
+                self.split_btn = tk.Button(self.split_frame, text=tr("Split"), bg=button_gray, fg="white", bd=0,
                                            relief=tk.FLAT, highlightthickness=0,
                                            font=scale_font(("Arial", 10, "bold")), command=self._on_split_clicked)
                 self.split_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
@@ -2033,8 +2034,8 @@ class PlayerInfoBlock:
                 if not getattr(self, 'gyro_btn_l', None):
                     self.gyro_frame_l = tk.Frame(self.battery_frame, bg=block_color)
                     self.gyro_frame_r = tk.Frame(self.battery_frame, bg=block_color)
-                    self.gyro_btn_l = tk.Button(self.gyro_frame_l, text="L Gyro", font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, command=lambda: self._on_gyro_side_toggled("Left"))
-                    self.gyro_btn_r = tk.Button(self.gyro_frame_r, text="R Gyro", font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, command=lambda: self._on_gyro_side_toggled("Right"))
+                    self.gyro_btn_l = tk.Button(self.gyro_frame_l, text=tr("L Gyro"), font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, command=lambda: self._on_gyro_side_toggled("Left"))
+                    self.gyro_btn_r = tk.Button(self.gyro_frame_r, text=tr("R Gyro"), font=scale_font(("Arial", 8, "bold")), bd=0, relief=tk.FLAT, command=lambda: self._on_gyro_side_toggled("Right"))
                     self.gyro_btn_l.pack(); self.gyro_btn_r.pack()
     
                 self.gyro_frame_l.place(relx=0.04, rely=0.5, anchor=tk.W)
@@ -2084,7 +2085,7 @@ class PlayerInfoBlock:
                         if p_vc and ((is_left and p_vc.is_single_joycon_right()) or (is_right and p_vc.is_single_joycon_left())):
                             m_text = "Merge"; m_color = "#FFFFFF"; m_border = "#FF8C00"; m_pad = 2
 
-                    self.merge_btn.config(text=m_text, bg=button_gray, fg=m_color)
+                    self.merge_btn.config(text=tr(m_text), bg=button_gray, fg=m_color)
                     self.merge_frame.config(bg=m_border)
                     self.merge_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor)) # Consistent size
                 elif getattr(self, 'merge_btn', None): self.merge_frame.place_forget()
@@ -2107,7 +2108,7 @@ class PlayerInfoBlock:
             self.player_row.pack_propagate(False)
             self.player_led_label = tk.Label(self.player_row, bg=player_number_bg_color)
             self.vibrate_frame = tk.Frame(self.player_row, bg=button_gray)
-            self.vibrate_btn = tk.Button(self.vibrate_frame, text="Ping", bg=button_gray, fg="white", bd=0, relief=tk.FLAT, font=scale_font(("Arial", 9, "bold")), width=5, command=self._on_vibrate_clicked)
+            self.vibrate_btn = tk.Button(self.vibrate_frame, text=tr("Ping"), bg=button_gray, fg="white", bd=0, relief=tk.FLAT, font=scale_font(("Arial", 9, "bold")), width=5, command=self._on_vibrate_clicked)
             self.vibrate_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
         self.player_row.pack(pady=int(10 * scaling_factor))
         self.player_led_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
@@ -2144,8 +2145,8 @@ class CalibrationOverlay:
         else:
             color = "#0a84ff" # Blue
             
-        self.lbl_title.config(text=title, fg=color)
-        self.lbl_msg.config(text=message)
+        self.lbl_title.config(text=tr(title), fg=color)
+        self.lbl_msg.config(text=tr(message))
         
         # Cancel any pending auto-close timer
         if self.close_timer:
@@ -2177,10 +2178,10 @@ class CalibrationOverlay:
         frame = tk.Frame(self.window, bg="#1c1c1e", highlightbackground="#3a3a3c", highlightthickness=2, bd=0)
         frame.pack(fill="both", expand=True)
         
-        self.lbl_title = tk.Label(frame, text="Switch 2 Connect", fg="#0a84ff", bg="#1c1c1e", font=scale_font(("Segoe UI", 11, "bold")))
+        self.lbl_title = tk.Label(frame, text=tr("Switch 2 Connect"), fg="#0a84ff", bg="#1c1c1e", font=scale_font(("Segoe UI", 11, "bold")))
         self.lbl_title.pack(anchor="w", padx=int(20 * scaling_factor), pady=(int(12 * scaling_factor), int(2 * scaling_factor)))
         
-        self.lbl_msg = tk.Label(frame, text="", fg="#ffffff", bg="#1c1c1e", font=scale_font(("Segoe UI", 11)), justify="left", wraplength=int(460 * scaling_factor))
+        self.lbl_msg = tk.Label(frame, text=tr(""), fg="#ffffff", bg="#1c1c1e", font=scale_font(("Segoe UI", 11)), justify="left", wraplength=int(460 * scaling_factor))
         self.lbl_msg.pack(anchor="w", padx=int(20 * scaling_factor), pady=(0, int(12 * scaling_factor)))
 
     def close(self):
@@ -2226,32 +2227,32 @@ class CalibrationOverlay:
             frame = tk.Frame(self.profile_window, bg=BG, highlightbackground="#3a3a3c", highlightthickness=2, bd=0)
             frame.pack(fill="both", expand=True)
 
-            tk.Label(frame, text="Change Profile To", fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 11, "bold"))).pack(padx=pad, pady=(int(10 * scaling_factor), int(6 * scaling_factor)))
+            tk.Label(frame, text=tr("Change Profile To"), fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 11, "bold"))).pack(padx=pad, pady=(int(10 * scaling_factor), int(6 * scaling_factor)))
 
-            self._profile_prev_lbl = tk.Label(frame, text=" ", fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 11)))
+            self._profile_prev_lbl = tk.Label(frame, text=tr(" "), fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 11)))
             self._profile_prev_lbl.pack(padx=pad)
 
             sel_wrap = tk.Frame(frame, bg=BG, highlightbackground=CYAN, highlightcolor=CYAN, highlightthickness=2, bd=0)
             sel_wrap.pack(pady=int(2 * scaling_factor))
-            self._profile_sel_lbl = tk.Label(sel_wrap, text=" ", fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 11, "bold")))
+            self._profile_sel_lbl = tk.Label(sel_wrap, text=tr(" "), fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 11, "bold")))
             self._profile_sel_lbl.pack(padx=int(6 * scaling_factor), pady=int(1 * scaling_factor))
 
-            self._profile_next_lbl = tk.Label(frame, text=" ", fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 11)))
+            self._profile_next_lbl = tk.Label(frame, text=tr(" "), fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 11)))
             self._profile_next_lbl.pack(padx=pad)
 
             if manual:
-                tk.Label(frame, text=f"Press {layout_label} Layout", fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 10))).pack(pady=(int(8 * scaling_factor), 0))
+                tk.Label(frame, text=tr(f"Press {layout_label} Layout"), fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 10))).pack(pady=(int(8 * scaling_factor), 0))
                 row = tk.Frame(frame, bg=BG)
                 row.pack(pady=(0, int(10 * scaling_factor)))
-                tk.Label(row, text="A button to SELECT", fg=GREEN, bg=BG, font=scale_font(("Segoe UI", 10, "bold"))).pack(side=tk.LEFT)
-                tk.Label(row, text=" or ", fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 10))).pack(side=tk.LEFT)
-                tk.Label(row, text="B button to CANCEL", fg=RED, bg=BG, font=scale_font(("Segoe UI", 10, "bold"))).pack(side=tk.LEFT)
+                tk.Label(row, text=tr("A button to SELECT"), fg=GREEN, bg=BG, font=scale_font(("Segoe UI", 10, "bold"))).pack(side=tk.LEFT)
+                tk.Label(row, text=tr(" or "), fg=WHITE, bg=BG, font=scale_font(("Segoe UI", 10))).pack(side=tk.LEFT)
+                tk.Label(row, text=tr("B button to CANCEL"), fg=RED, bg=BG, font=scale_font(("Segoe UI", 10, "bold"))).pack(side=tk.LEFT)
             else:
                 tk.Frame(frame, bg=BG, height=int(8 * scaling_factor)).pack()
 
-            self._profile_prev_lbl.config(text=prev_name or " ")
-            self._profile_sel_lbl.config(text=selected_name or " ")
-            self._profile_next_lbl.config(text=next_name or " ")
+            self._profile_prev_lbl.config(text=tr(prev_name or " "))
+            self._profile_sel_lbl.config(text=tr(selected_name or " "))
+            self._profile_next_lbl.config(text=tr(next_name or " "))
 
             # Width: 2/3 of the old notification width as a lower bound, widened to fit
             # the longest profile name in the change list (name_px) so cycling never
@@ -2266,9 +2267,9 @@ class CalibrationOverlay:
             y = sh - h - int(70 * scaling_factor)
             self.profile_window.geometry(f"{w}x{h}+{x}+{y}")
         else:
-            self._profile_prev_lbl.config(text=prev_name or " ")
-            self._profile_sel_lbl.config(text=selected_name or " ")
-            self._profile_next_lbl.config(text=next_name or " ")
+            self._profile_prev_lbl.config(text=tr(prev_name or " "))
+            self._profile_sel_lbl.config(text=tr(selected_name or " "))
+            self._profile_next_lbl.config(text=tr(next_name or " "))
 
         self.profile_window.lift()
 
@@ -2335,7 +2336,7 @@ class JoystickCalibrationWizard:
         self._set_controller_flags(True)
 
         self.window = tk.Toplevel(root)
-        self.window.title("Joysticks Calibration")
+        self.window.title(tr("Joysticks Calibration"))
         self.window.overrideredirect(True)
         self.window.attributes("-topmost", True)
         self.window.attributes("-alpha", 0.95)
@@ -2345,9 +2346,9 @@ class JoystickCalibrationWizard:
 
         self.frame = tk.Frame(self.window, bg="#1c1c1e", highlightbackground="#3a3a3c", highlightthickness=2, bd=0)
         self.frame.pack(fill="both", expand=True)
-        self.title_label = tk.Label(self.frame, text="Joysticks Calibration", fg="#0a84ff", bg="#1c1c1e", font=scale_font(("Segoe UI", 12, "bold")))
+        self.title_label = tk.Label(self.frame, text=tr("Joysticks Calibration"), fg="#0a84ff", bg="#1c1c1e", font=scale_font(("Segoe UI", 12, "bold")))
         self.title_label.pack(anchor="w", padx=int(20 * scaling_factor), pady=(int(12 * scaling_factor), int(4 * scaling_factor)))
-        self.message_label = tk.Label(self.frame, text="", fg="white", bg="#1c1c1e", font=scale_font(("Segoe UI", 11)), justify="center")
+        self.message_label = tk.Label(self.frame, text=tr(""), fg="white", bg="#1c1c1e", font=scale_font(("Segoe UI", 11)), justify="center")
         self.message_label.pack(padx=int(20 * scaling_factor), pady=(0, int(10 * scaling_factor)))
         self.grid_frame = tk.Frame(self.frame, bg="#1c1c1e")
         self.grid_frame.pack(padx=int(20 * scaling_factor), pady=(0, int(14 * scaling_factor)))
@@ -2388,8 +2389,8 @@ class JoystickCalibrationWizard:
         self.value_labels.clear()
         col_count = len(self.sources)
         for idx, source in enumerate(self.sources):
-            tk.Label(self.grid_frame, text=source["label"], fg="white", bg="#1c1c1e", font=scale_font(("Segoe UI", 11, "bold")), width=14).grid(row=0, column=idx, padx=int(12 * scaling_factor))
-            value = tk.Label(self.grid_frame, text="10", fg="#30d158", bg="#1c1c1e", font=scale_font(("Segoe UI", 18, "bold")), width=8)
+            tk.Label(self.grid_frame, text=tr(source["label"]), fg="white", bg="#1c1c1e", font=scale_font(("Segoe UI", 11, "bold")), width=14).grid(row=0, column=idx, padx=int(12 * scaling_factor))
+            value = tk.Label(self.grid_frame, text=tr("10"), fg="#30d158", bg="#1c1c1e", font=scale_font(("Segoe UI", 18, "bold")), width=8)
             value.grid(row=1, column=idx, padx=int(12 * scaling_factor), pady=(int(4 * scaling_factor), 0))
             self.value_labels[source["key"]] = value
         for idx in range(col_count):
@@ -2473,15 +2474,15 @@ class JoystickCalibrationWizard:
 
     def _refresh_text(self):
         if self.stage == "rotate":
-            self.message_label.config(text="Please fully rotate both joysticks for 10 seconds each.")
+            self.message_label.config(text=tr("Please fully rotate both joysticks for 10 seconds each."))
             for key, item in self.data.items():
                 text = "Done" if item["rotate_done"] else str(max(0, int(self.ROTATE_SECONDS - item["rotate_elapsed"] + 0.999)))
-                self.value_labels[key].config(text=text)
+                self.value_labels[key].config(text=tr(text))
         elif self.stage == "release":
-            self.message_label.config(text="Please release and don't touch the joysticks for 3 seconds.")
+            self.message_label.config(text=tr("Please release and don't touch the joysticks for 3 seconds."))
             for key, item in self.data.items():
                 text = "Done" if item["release_done"] else str(max(0, int(self.RELEASE_SECONDS - item["release_elapsed"] + 0.999)))
-                self.value_labels[key].config(text=text)
+                self.value_labels[key].config(text=tr(text))
 
     def _finish(self):
         self.completed = True
@@ -2525,7 +2526,7 @@ class JoystickCalibrationWizard:
 
         for child in self.grid_frame.winfo_children():
             child.destroy()
-        self.message_label.config(text="Joysticks calibration done.")
+        self.message_label.config(text=tr("Joysticks calibration done."))
         self.title_label.config(fg="#30d158")
         self._place_notification()
         self.auto_close_timer = self.root.after(3000, self.close)
@@ -2557,7 +2558,7 @@ class GCTriggerCalibrationWizard:
         self.root = root
         self.gc_controller = gc_controller
         self.window = tk.Toplevel(root)
-        self.window.title("GameCube Trigger Calibration")
+        self.window.title(tr("GameCube Trigger Calibration"))
         w, h = int(450 * scaling_factor), int(180 * scaling_factor)
         self.window.geometry(f"{w}x{h}")
         self.window.attributes("-topmost", True)
@@ -2571,22 +2572,22 @@ class GCTriggerCalibrationWizard:
         self.bump_r = 190
         self.max_r = 240
 
-        self.title_label = tk.Label(self.window, text="Step 1: Base State", font=scale_font(("Arial", 14, "bold")), bg=background_color, fg=highlight_color)
+        self.title_label = tk.Label(self.window, text=tr("Step 1: Base State"), font=scale_font(("Arial", 14, "bold")), bg=background_color, fg=highlight_color)
         self.title_label.pack(pady=(int(10 * scaling_factor), 0))
 
-        self.desc_label = tk.Label(self.window, text="Release both triggers completely and wait a moment.\nThen click Next.", font=scale_font(("Arial", 11)), bg=background_color, fg="white", wraplength=int(400 * scaling_factor))
+        self.desc_label = tk.Label(self.window, text=tr("Release both triggers completely and wait a moment.\nThen click Next."), font=scale_font(("Arial", 11)), bg=background_color, fg="white", wraplength=int(400 * scaling_factor))
         self.desc_label.pack(pady=int(10 * scaling_factor))
 
-        self.val_label = tk.Label(self.window, text="L: 0 | R: 0", font=scale_font(("Arial", 10)), bg=background_color, fg="#888888")
+        self.val_label = tk.Label(self.window, text=tr("L: 0 | R: 0"), font=scale_font(("Arial", 10)), bg=background_color, fg="#888888")
         self.val_label.pack(pady=(0, int(10 * scaling_factor)))
 
         self.btn_frame = tk.Frame(self.window, bg=background_color)
         self.btn_frame.pack()
 
-        self.cancel_btn = tk.Button(self.btn_frame, text="Cancel", font=scale_font(("Arial", 10)), bg=button_gray, fg="white", bd=0, command=self.close)
+        self.cancel_btn = tk.Button(self.btn_frame, text=tr("Cancel"), font=scale_font(("Arial", 10)), bg=button_gray, fg="white", bd=0, command=self.close)
         self.cancel_btn.pack(side=tk.LEFT, padx=int(10 * scaling_factor))
 
-        self.next_btn = tk.Button(self.btn_frame, text="Next", font=scale_font(("Arial", 10, "bold")), bg=highlight_color, fg="black", bd=0, command=self.on_next)
+        self.next_btn = tk.Button(self.btn_frame, text=tr("Next"), font=scale_font(("Arial", 10, "bold")), bg=highlight_color, fg="black", bd=0, command=self.on_next)
         self.next_btn.pack(side=tk.LEFT, padx=int(10 * scaling_factor))
 
         self.update_loop()
@@ -2597,7 +2598,7 @@ class GCTriggerCalibrationWizard:
         if hasattr(self.gc_controller, 'last_input_data') and self.gc_controller.last_input_data:
             l = self.gc_controller.last_input_data.left_trigger_raw
             r = self.gc_controller.last_input_data.right_trigger_raw
-            self.val_label.config(text=f"L: {l} | R: {r}")
+            self.val_label.config(text=tr(f"L: {l} | R: {r}"))
             
             if self.step == 0:
                 self.min_l = l
@@ -2616,31 +2617,31 @@ class GCTriggerCalibrationWizard:
     def on_next(self):
         if self.step == 0:
             self.step = 1
-            self.title_label.config(text="Step 2: Left Trigger (Bump)")
-            self.desc_label.config(text="Press the LEFT trigger down just until you feel the click (bump).\nHold it there and click Next.")
+            self.title_label.config(text=tr("Step 2: Left Trigger (Bump)"))
+            self.desc_label.config(text=tr("Press the LEFT trigger down just until you feel the click (bump).\nHold it there and click Next."))
             self.bump_l = 0
         elif self.step == 1:
             self.step = 2
-            self.title_label.config(text="Step 3: Left Trigger (Max)")
-            self.desc_label.config(text="Fully press the LEFT trigger all the way down past the click.\nWhile holding it down, click Next.")
+            self.title_label.config(text=tr("Step 3: Left Trigger (Max)"))
+            self.desc_label.config(text=tr("Fully press the LEFT trigger all the way down past the click.\nWhile holding it down, click Next."))
             self.max_l = 0
         elif self.step == 2:
             self.step = 3
-            self.title_label.config(text="Step 4: Right Trigger (Bump)")
-            self.desc_label.config(text="Press the RIGHT trigger down just until you feel the click (bump).\nHold it there and click Next.")
+            self.title_label.config(text=tr("Step 4: Right Trigger (Bump)"))
+            self.desc_label.config(text=tr("Press the RIGHT trigger down just until you feel the click (bump).\nHold it there and click Next."))
             self.bump_r = 0
         elif self.step == 3:
             self.step = 4
-            self.title_label.config(text="Step 5: Right Trigger (Max)")
-            self.desc_label.config(text="Fully press the RIGHT trigger all the way down past the click.\nWhile holding it down, click Finish.")
+            self.title_label.config(text=tr("Step 5: Right Trigger (Max)"))
+            self.desc_label.config(text=tr("Fully press the RIGHT trigger all the way down past the click.\nWhile holding it down, click Finish."))
             self.max_r = 0
-            self.next_btn.config(text="Finish")
+            self.next_btn.config(text=tr("Finish"))
         elif self.step == 4:
             CONFIG.gc_trigger_calibration_data[self.gc_controller.device.address] = [self.min_l, self.bump_l, self.max_l, self.min_r, self.bump_r, self.max_r]
             CONFIG.save_config()
             logger.info(f"Saved GC Trigger Calibration for {self.gc_controller.device.address}: {CONFIG.gc_trigger_calibration_data[self.gc_controller.device.address]}")
             from tkinter import messagebox
-            messagebox.showinfo("Success", "GameCube Trigger Calibration saved successfully!")
+            messagebox.showinfo(tr("Success"), tr("GameCube Trigger Calibration saved successfully!"))
             self.close()
 
     def close(self):
@@ -2969,7 +2970,7 @@ class ControllerWindow:
         extra_lines = message.count("\n") + max(0, len(message) // 70)
         dialog_h = max(int(150 * scaling_factor), min(int(280 * scaling_factor), int((135 + extra_lines * 18) * scaling_factor)))
         dialog = tk.Toplevel(self.root)
-        dialog.title(title)
+        dialog.title(tr(title))
         dialog.resizable(False, False)
         dialog.config(bg="#1E1E1E")
         dialog.transient(self.root)
@@ -2980,7 +2981,7 @@ class ControllerWindow:
 
         tk.Label(
             dialog,
-            text=message,
+            text=tr(message),
             fg="white",
             bg="#1E1E1E",
             font=scale_font(("Arial", 11, "bold")),
@@ -3001,7 +3002,7 @@ class ControllerWindow:
             frame.pack(side=tk.LEFT, padx=int(6 * scaling_factor))
             btn = tk.Button(
                 frame,
-                text=button_text,
+                text=tr(button_text),
                 bg=button_gray,
                 fg=text_color,
                 bd=0,
@@ -3369,8 +3370,8 @@ class ControllerWindow:
             if discoverer_was_running:
                 self.start_discoverer_thread()
             messagebox.showerror(
-                ESP32S3_LABEL,
-                "Could not find the ESP32-S3 N16R8 CH343/COM flashing port.\nConnect the flashing Type-C/CH343P port and try again."
+                tr(ESP32S3_LABEL),
+                tr("Could not find the ESP32-S3 N16R8 CH343/COM flashing port.\nConnect the flashing Type-C/CH343P port and try again.")
             )
             return
 
@@ -3386,7 +3387,7 @@ class ControllerWindow:
         }
 
         progress_win = tk.Toplevel(self.root)
-        progress_win.title(title_map.get(action, "ESP32-S3 N16R8 Firmware"))
+        progress_win.title(tr(title_map.get(action, "ESP32-S3 N16R8 Firmware")))
         progress_win.geometry(f"{int(460 * scaling_factor)}x{int(150 * scaling_factor)}+180+180")
         progress_win.resizable(False, False)
         progress_win.config(bg="#1E1E1E")
@@ -3395,7 +3396,7 @@ class ControllerWindow:
 
         label = tk.Label(
             progress_win,
-            text=f"{ESP32S3_LABEL}: {verb_map.get(action, 'working')} firmware on {status.serial_port.port}...",
+            text=tr(f"{ESP32S3_LABEL}: {verb_map.get(action, 'working')} firmware on {status.serial_port.port}..."),
             fg="white", bg="#1E1E1E",
             font=scale_font(("Arial", 11, "bold")),
             wraplength=int(420 * scaling_factor),
@@ -3416,7 +3417,7 @@ class ControllerWindow:
 
         percent_label = tk.Label(
             progress_win,
-            text="0%",
+            text=tr("0%"),
             fg="white", bg="#1E1E1E",
             font=scale_font(("Arial", 11, "bold"))
         )
@@ -3462,21 +3463,21 @@ class ControllerWindow:
                 if action == "delete":
                     # Uninstall succeeded — firmware is gone, no replug needed.
                     messagebox.showinfo(
-                        ESP32S3_LABEL,
-                        "ESP32-S3 N16R8 firmware uninstalled successfully.",
+                        tr(ESP32S3_LABEL),
+                        tr("ESP32-S3 N16R8 firmware uninstalled successfully."),
                     )
                 elif not auto:
                     messagebox.showinfo(
-                        ESP32S3_LABEL,
-                        "ESP32-S3 N16R8 firmware installed successfully.\n\n"
+                        tr(ESP32S3_LABEL),
+                        tr("ESP32-S3 N16R8 firmware installed successfully.\n\n"
                         "Please replug the ESP32-S3 USB cable (unplug then reinsert) "
-                        "to complete initialization and avoid port conflicts.",
+                        "to complete initialization and avoid port conflicts."),
                     )
                 else:
                     # Auto-update path: show a brief replug reminder in a non-blocking way.
                     messagebox.showinfo(
-                        ESP32S3_LABEL,
-                        "Firmware auto-updated. Please replug the ESP32-S3 USB cable.",
+                        tr(ESP32S3_LABEL),
+                        tr("Firmware auto-updated. Please replug the ESP32-S3 USB cable."),
                     )
 
                 if on_complete:
@@ -3504,16 +3505,16 @@ class ControllerWindow:
                 if ("Could not communicate with ESP32-S3" in error_str
                         or ("Could not put ESP32-S3" in error_str
                             and "into flashing mode" in error_str)):
-                    messagebox.showerror(ESP32S3_LABEL, (
-                        "Could not enter flashing mode.\n\n"
+                    messagebox.showerror(tr(ESP32S3_LABEL), (
+                        tr("Could not enter flashing mode.\n\n"
                         "To enter Boot mode manually:\n"
                         "  1. Hold the BOOT button\n"
                         "  2. Tap RESET once, then release BOOT\n"
                         "  3. Click Repair to retry\n\n"
-                        f"Details logged to:\n{_log_path}"
+                        f"Details logged to:\n{_log_path}")
                     ))
                 else:
-                    messagebox.showerror(ESP32S3_LABEL, f"ESP32-S3 N16R8 firmware operation failed:\n{done['error']}")
+                    messagebox.showerror(tr(ESP32S3_LABEL), tr(f"ESP32-S3 N16R8 firmware operation failed:\n{done['error']}"))
                 self.refresh_esp32s3_status()
                 if on_complete:
                     on_complete(done["ok"])
@@ -3543,9 +3544,9 @@ class ControllerWindow:
                 percent = current
             percent = max(current, min(100.0, percent))
             progress_var.set(percent)
-            percent_label.config(text=f"{int(percent)}%")
+            percent_label.config(text=tr(f"{int(percent)}%"))
             if message and progress_win.winfo_exists():
-                label.config(text=message)
+                label.config(text=tr(message))
 
         def poll_progress_queue():
             should_finish = False
@@ -3561,7 +3562,7 @@ class ControllerWindow:
                     should_finish = True
             if should_finish:
                 progress_var.set(100)
-                percent_label.config(text="100%")
+                percent_label.config(text=tr("100%"))
                 finish()
             elif progress_win.winfo_exists():
                 progress_win.after(50, poll_progress_queue)
@@ -3612,7 +3613,7 @@ class ControllerWindow:
         # serial-port list are ready.  WMI enumeration can otherwise expose a
         # short-lived empty window while this function is still constructing it.
         dialog.withdraw()
-        dialog.title(ESP32S3_LABEL)
+        dialog.title(tr(ESP32S3_LABEL))
         dialog.resizable(False, False)
         dialog.config(bg="#1E1E1E")
         dialog.transient(self.root)
@@ -3628,7 +3629,7 @@ class ControllerWindow:
 
         info_label = tk.Label(
             dialog,
-            text=f"{ESP32S3_LABEL}\nFirmware: {firmware_text}",
+            text=tr(f"{ESP32S3_LABEL}\nFirmware: {firmware_text}"),
             fg="white", bg="#1E1E1E",
             font=scale_font(("Arial", 11, "bold")),
             justify=tk.LEFT,
@@ -3637,7 +3638,7 @@ class ControllerWindow:
 
         port_frame = tk.Frame(dialog, bg="#1E1E1E")
         port_frame.pack(fill=tk.X, padx=int(16 * scaling_factor), pady=(0, int(4 * scaling_factor)))
-        tk.Label(port_frame, text="Flashing Port:", fg="white", bg="#1E1E1E",
+        tk.Label(port_frame, text=tr("Flashing Port:"), fg="white", bg="#1E1E1E",
                  font=scale_font(("Arial", 10, "bold"))).pack(side=tk.LEFT)
         port_choice = tk.StringVar()
         port_combo = ttk.Combobox(port_frame, textvariable=port_choice, state="readonly",
@@ -3698,13 +3699,13 @@ class ControllerWindow:
             threading.Thread(target=worker, daemon=True).start()
 
         port_combo.bind("<<ComboboxSelected>>", select_port)
-        tk.Button(port_frame, text="Refresh", bg=button_gray, fg=text_color,
+        tk.Button(port_frame, text=tr("Refresh"), bg=button_gray, fg=text_color,
                   bd=0, relief=tk.FLAT, font=scale_font(("Arial", 9, "bold")),
                   command=refresh_port_choices).pack(side=tk.LEFT, padx=(int(6 * scaling_factor), 0))
         refresh_port_choices()
 
         boot_status_label = tk.Label(
-            dialog, text="", fg="white", bg="#1E1E1E",
+            dialog, text=tr(""), fg="white", bg="#1E1E1E",
             font=scale_font(("Arial", 9, "bold")), justify=tk.LEFT,
             wraplength=int(440 * scaling_factor),
         )
@@ -3716,12 +3717,12 @@ class ControllerWindow:
             dialog, orient=tk.HORIZONTAL, mode="determinate", maximum=100,
             variable=progress_var, length=int(380 * scaling_factor),
         )
-        percent_label = tk.Label(dialog, text="0%", fg="white", bg="#1E1E1E",
+        percent_label = tk.Label(dialog, text=tr("0%"), fg="white", bg="#1E1E1E",
                                  font=scale_font(("Arial", 11, "bold")))
 
         # Result label (hidden until done)
         result_label = tk.Label(
-            dialog, text="", fg="lightgreen", bg="#1E1E1E",
+            dialog, text=tr(""), fg="lightgreen", bg="#1E1E1E",
             font=scale_font(("Arial", 10, "bold")),
             wraplength=int(440 * scaling_factor), justify=tk.CENTER,
         )
@@ -3770,17 +3771,17 @@ class ControllerWindow:
                 firmware = "Not installed"
             port = (new_status.serial_port.port
                     if new_status and new_status.serial_port else "CH343/COM not detected")
-            info_label.config(text=f"{ESP32S3_LABEL}\nFirmware: {firmware}")
+            info_label.config(text=tr(f"{ESP32S3_LABEL}\nFirmware: {firmware}"))
             if current_boot:
                 boot_status_label.config(
-                    text="OTG Boot mode detected — ready to install firmware.", fg="#55CC55")
+                    text=tr("OTG Boot mode detected — ready to install firmware."), fg="#55CC55")
             elif current_otg:
                 boot_status_label.config(
-                    text=("OTG port detected (firmware running). Please enter Boot mode first:\n"
-                          "Hold BOOT, tap RESET once, release BOOT — then click Install."),
+                    text=(tr("OTG port detected (firmware running). Please enter Boot mode first:\n"
+                          "Hold BOOT, tap RESET once, release BOOT — then click Install.")),
                     fg="#FF8800")
             else:
-                boot_status_label.config(text="")
+                boot_status_label.config(text=tr(""))
             flash_button_state = tk.NORMAL if (not current_otg or current_boot) else tk.DISABLED
             for action in ("install", "repair"):
                 button = action_buttons.get(action)
@@ -3831,7 +3832,7 @@ class ControllerWindow:
             current_boot = current_otg and not bool(
                 current_status and getattr(current_status, "firmware_installed", False))
             if action == "delete":
-                if not messagebox.askyesno(ESP32S3_LABEL, "Erase ESP32-S3 N16R8 firmware?", parent=dialog):
+                if not messagebox.askyesno(tr(ESP32S3_LABEL), tr("Erase ESP32-S3 N16R8 firmware?"), parent=dialog):
                     return
 
             # OTG port with firmware running — cannot flash until Boot mode is entered.
@@ -3841,11 +3842,11 @@ class ControllerWindow:
                 tk.Label(
                     dialog,
                     text=(
-                        "ESP32 is not in Boot mode — firmware cannot be installed.\n\n"
+                        tr("ESP32 is not in Boot mode — firmware cannot be installed.\n\n"
                         "To enter Boot mode:\n"
                         "  1. Hold the BOOT button\n"
                         "  2. Tap RESET once, then release BOOT\n"
-                        "  3. Wait for Status to show \"Boot\", then click Install"
+                        "  3. Wait for Status to show \"Boot\", then click Install")
                     ),
                     fg="#FF3333", bg="#1E1E1E",
                     font=scale_font(("Arial", 12, "bold")),
@@ -3855,7 +3856,7 @@ class ControllerWindow:
                 close_btn_frame = tk.Frame(dialog, bg=button_gray)
                 close_btn_frame.pack(pady=int(6 * scaling_factor))
                 tk.Button(
-                    close_btn_frame, text="Close", bg=button_gray, fg=text_color,
+                    close_btn_frame, text=tr("Close"), bg=button_gray, fg=text_color,
                     bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), width=8,
                     command=close_dialog,
                 ).pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
@@ -3874,7 +3875,7 @@ class ControllerWindow:
                 percent_label.pack_forget()
                 is_boot_guidance = not ok and message.startswith("Could not enter flashing mode")
                 result_label.config(
-                    text=message,
+                    text=tr(message),
                     fg="lightgreen" if ok else "#FF3333",
                     font=scale_font(("Arial", 12, "bold")) if is_boot_guidance else scale_font(("Arial", 10, "bold")),
                 )
@@ -3882,7 +3883,7 @@ class ControllerWindow:
                 close_btn_frame = tk.Frame(dialog, bg=button_gray)
                 close_btn_frame.pack(pady=int(6 * scaling_factor))
                 tk.Button(
-                    close_btn_frame, text="Close", bg=button_gray, fg=text_color,
+                    close_btn_frame, text=tr("Close"), bg=button_gray, fg=text_color,
                     bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), width=8,
                     command=close_dialog,
                 ).pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
@@ -3895,7 +3896,7 @@ class ControllerWindow:
             frame = tk.Frame(sel_frame, bg=button_gray)
             frame.pack(side=tk.LEFT, padx=int(6 * scaling_factor))
             action_button = tk.Button(
-                frame, text=text, bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT,
+                frame, text=tr(text), bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT,
                 font=scale_font(("Arial", 10, "bold")), width=8,
                 command=lambda a=action: choose(a),
             )
@@ -3905,7 +3906,7 @@ class ControllerWindow:
         cancel_frame = tk.Frame(sel_frame, bg=button_gray)
         cancel_frame.pack(side=tk.LEFT, padx=int(6 * scaling_factor))
         tk.Button(
-            cancel_frame, text="Cancel", bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT,
+            cancel_frame, text=tr("Cancel"), bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT,
             font=scale_font(("Arial", 10, "bold")), width=8, command=close_dialog,
         ).pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
@@ -3920,7 +3921,7 @@ class ControllerWindow:
         dialog_w = int(480 * scaling_factor)
         dialog_h = int(220 * scaling_factor)
         dialog = tk.Toplevel(self.root)
-        dialog.title(label)
+        dialog.title(tr(label))
         dialog.resizable(False, False)
         dialog.config(bg="#1E1E1E")
         dialog.transient(self.root)
@@ -3937,12 +3938,12 @@ class ControllerWindow:
         tk.Label(
             dialog,
             text=(
-                "ESP32-S3 is connected via OTG / native USB.\n\n"
+                tr("ESP32-S3 is connected via OTG / native USB.\n\n"
                 "Firmware cannot be flashed automatically on this port.\n\n"
                 "To install firmware, please:\n"
                 "  1. Hold the BOOT button on the ESP32-S3 board\n"
                 "  2. Tap the RESET button once, then release BOOT\n"
-                "  3. Connect the CH343P / UART Type-C port and retry."
+                "  3. Connect the CH343P / UART Type-C port and retry.")
             ),
             fg="white", bg="#1E1E1E",
             font=scale_font(("Arial", 10, "bold")),
@@ -3953,7 +3954,7 @@ class ControllerWindow:
         close_frame = tk.Frame(dialog, bg=button_gray)
         close_frame.pack(pady=int(6 * scaling_factor))
         tk.Button(
-            close_frame, text="OK", bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT,
+            close_frame, text=tr("OK"), bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT,
             font=scale_font(("Arial", 10, "bold")), width=8,
             command=lambda: (dialog.grab_release(), dialog.destroy()),
         ).pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
@@ -4010,7 +4011,7 @@ class ControllerWindow:
         verb_map = {"install": "Installing", "repair": "Repairing", "delete": "Deleting"}
         if dialog.winfo_exists():
             info_label.config(
-                text=f"{ESP32S3_LABEL}: {verb_map.get(action, 'Working')} firmware on {selected_port.port}..."
+                text=tr(f"{ESP32S3_LABEL}: {verb_map.get(action, 'Working')} firmware on {selected_port.port}...")
             )
 
         done = {"ok": False, "error": None}
@@ -4048,7 +4049,7 @@ class ControllerWindow:
             percent = max(current, min(100.0, percent))
             progress_var.set(percent)
             if dialog.winfo_exists():
-                percent_label.config(text=f"{int(percent)}%")
+                percent_label.config(text=tr(f"{int(percent)}%"))
 
         def finish():
             discovery_resumed = {"value": False}
@@ -4078,7 +4079,7 @@ class ControllerWindow:
                     pass
                 progress_var.set(100)
                 if dialog.winfo_exists():
-                    percent_label.config(text="100%")
+                    percent_label.config(text=tr("100%"))
                 if action == "delete":
                     on_done(True, "ESP32-S3 N16R8 firmware uninstalled successfully.")
                     self.refresh_esp32s3_status()
@@ -4158,7 +4159,7 @@ class ControllerWindow:
             if should_finish:
                 progress_var.set(100)
                 if dialog.winfo_exists():
-                    percent_label.config(text="100%")
+                    percent_label.config(text=tr("100%"))
                 finish()
             elif dialog.winfo_exists():
                 dialog.after(50, poll)
@@ -4475,13 +4476,13 @@ class ControllerWindow:
             return False
 
         progress_win = tk.Toplevel(self.root)
-        progress_win.title("Install ViGEmBus Driver")
+        progress_win.title(tr("Install ViGEmBus Driver"))
         progress_win.resizable(False, False)
         progress_win.config(bg="#1E1E1E")
         progress_win.transient(self.root)
         progress_win.grab_set()
         self.center_window_on_root(progress_win, int(450 * scaling_factor), int(130 * scaling_factor))
-        tk.Label(progress_win, text="Installing ViGEmBus driver...\nPlease authorize the UAC prompt if asked.",
+        tk.Label(progress_win, text=tr("Installing ViGEmBus driver...\nPlease authorize the UAC prompt if asked."),
                  fg="white", bg="#1E1E1E", font=scale_font(("Arial", 11, "bold"))).pack(pady=int(40 * scaling_factor))
 
         hProcess = self._launch_elevated("msiexec.exe", f'/i "{msi}" /qn /norestart', progress_win=progress_win)
@@ -4553,7 +4554,7 @@ class ControllerWindow:
         emergency_cleanup()
 
         progress_win = tk.Toplevel(self.root)
-        progress_win.title(f"{title_verb} {spec.display_name} Driver")
+        progress_win.title(tr(f"{title_verb} {spec.display_name} Driver"))
         progress_w = int(460 * scaling_factor)
         progress_h = int(140 * scaling_factor)
         progress_win.resizable(False, False)
@@ -4564,7 +4565,7 @@ class ControllerWindow:
 
         label = tk.Label(
             progress_win,
-            text=f"Downloading {spec.display_name} driver...",
+            text=tr(f"Downloading {spec.display_name} driver..."),
             fg="white", bg="#1E1E1E",
             font=scale_font(("Arial", 11, "bold")),
             justify="center"
@@ -4575,7 +4576,7 @@ class ControllerWindow:
 
         def set_label(text):
             try:
-                label.config(text=text)
+                label.config(text=tr(text))
             except Exception:
                 pass
 
@@ -4709,7 +4710,7 @@ class ControllerWindow:
         if os.path.exists(install_ps1):
             try:
                 progress_win = tk.Toplevel(self.root)
-                progress_win.title("Driver Installation")
+                progress_win.title(tr("Driver Installation"))
                 progress_w = int(450 * scaling_factor)
                 progress_h = int(130 * scaling_factor)
                 progress_win.resizable(False, False)
@@ -4720,7 +4721,7 @@ class ControllerWindow:
                 
                 label = tk.Label(
                     progress_win,
-                    text="Installing WinUHid Driver...\nPlease authorize the UAC prompt if asked.",
+                    text=tr("Installing WinUHid Driver...\nPlease authorize the UAC prompt if asked."),
                     fg="white", bg="#1E1E1E",
                     font=scale_font(("Arial", 11, "bold"))
                 )
@@ -4819,7 +4820,7 @@ class ControllerWindow:
         if os.path.exists(uninstall_ps1):
             try:
                 progress_win = tk.Toplevel(self.root)
-                progress_win.title("Driver Uninstallation")
+                progress_win.title(tr("Driver Uninstallation"))
                 progress_w = int(450 * scaling_factor)
                 progress_h = int(130 * scaling_factor)
                 progress_win.resizable(False, False)
@@ -4830,7 +4831,7 @@ class ControllerWindow:
                 
                 label = tk.Label(
                     progress_win,
-                    text="Uninstalling WinUHid Driver...\nPlease authorize the UAC prompt if asked.",
+                    text=tr("Uninstalling WinUHid Driver...\nPlease authorize the UAC prompt if asked."),
                     fg="white", bg="#1E1E1E",
                     font=scale_font(("Arial", 11, "bold"))
                 )
@@ -4955,7 +4956,7 @@ class ControllerWindow:
         if os.path.exists(uninstall_ps1):
             try:
                 progress_win = tk.Toplevel(self.root)
-                progress_win.title("ViGEmBus Uninstallation")
+                progress_win.title(tr("ViGEmBus Uninstallation"))
                 progress_w = int(450 * scaling_factor)
                 progress_h = int(130 * scaling_factor)
                 progress_win.resizable(False, False)
@@ -4966,7 +4967,7 @@ class ControllerWindow:
                 
                 label = tk.Label(
                     progress_win,
-                    text="Uninstalling ViGEmBus Driver...\nPlease authorize the UAC prompt if asked.",
+                    text=tr("Uninstalling ViGEmBus Driver...\nPlease authorize the UAC prompt if asked."),
                     fg="white", bg="#1E1E1E",
                     font=scale_font(("Arial", 11, "bold"))
                 )
@@ -5115,7 +5116,7 @@ class ControllerWindow:
         self.winuhid_manager_popup_anchor = anchor_widget
 
         self.winuhid_manager_keyboard_button = tk.Button(
-            popup, text="", bg=button_gray, fg=text_color,
+            popup, text=tr(""), bg=button_gray, fg=text_color,
             activebackground=button_gray, activeforeground=text_color,
             bd=0, relief=tk.FLAT, font=scale_font(("Arial", 11, "bold")),
             command=self.toggle_winuhid_keyboard_output,
@@ -5124,7 +5125,7 @@ class ControllerWindow:
             fill=tk.X, padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
         self.winuhid_manager_mouse_button = tk.Button(
-            popup, text="", bg=button_gray, fg=text_color,
+            popup, text=tr(""), bg=button_gray, fg=text_color,
             activebackground=button_gray, activeforeground=text_color,
             bd=0, relief=tk.FLAT, font=scale_font(("Arial", 11, "bold")),
             command=self.toggle_winuhid_mouse_output,
@@ -5133,7 +5134,7 @@ class ControllerWindow:
             fill=tk.X, padx=int(2 * scaling_factor), pady=(spacing, int(2 * scaling_factor)))
 
         self.winuhid_manager_driver_button = tk.Button(
-            popup, text="", bg=button_gray, fg=text_color,
+            popup, text=tr(""), bg=button_gray, fg=text_color,
             activebackground=button_gray, activeforeground=text_color,
             bd=0, relief=tk.FLAT, font=scale_font(("Arial", 11, "bold")),
             command=self.on_winuhid_manager_driver_action,
@@ -5161,16 +5162,16 @@ class ControllerWindow:
             action_text = "Install WinUHid Driver"
         if initialize_keyboard:
             keyboard_output.initialize()
-        self.winuhid_manager_driver_button.config(text=action_text, state=tk.NORMAL)
+        self.winuhid_manager_driver_button.config(text=tr(action_text), state=tk.NORMAL)
         keyboard_label = ("WinUHid Virtual HID"
                           if keyboard_output.effective_mode() == keyboard_output.RAW_INPUT
                           else "Win32 API")
         mouse_raw = (raw_input_mouse.requested_mode() == "Raw Input"
                      and status.state == WINUHID_HEALTHY)
         self.winuhid_manager_keyboard_button.config(
-            text=f"Keyboard: {keyboard_label}", state=tk.NORMAL)
+            text=tr(f"Keyboard: {keyboard_label}"), state=tk.NORMAL)
         self.winuhid_manager_mouse_button.config(
-            text=f"Mouse: {'WinUHid Virtual HID' if mouse_raw else 'Win32 API'}", state=tk.NORMAL)
+            text=tr(f"Mouse: {'WinUHid Virtual HID' if mouse_raw else 'Win32 API'}"), state=tk.NORMAL)
 
     def on_winuhid_manager_driver_action(self):
         status = get_winuhid_status(use_cache=False)
@@ -5303,13 +5304,13 @@ class ControllerWindow:
             if hasattr(self, 'esp32s3_frame'):
                 self.esp32s3_frame.config(bg=btn_color)
             if hasattr(self, 'esp32s3_btn'):
-                self.esp32s3_btn.config(text=btn_text, bg=btn_color)
+                self.esp32s3_btn.config(text=tr(btn_text), bg=btn_color)
             self.esp32s3_frame.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
 
         if hasattr(self, 'wired_pro_settings_frame'):
             # Name the button after whatever is actually plugged in.
             if hasattr(self, 'wired_pro_settings_btn'):
-                self.wired_pro_settings_btn.config(text=self.wired_controller_label())
+                self.wired_pro_settings_btn.config(text=tr(self.wired_controller_label()))
             self.wired_pro_settings_frame.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
 
         if hasattr(self, 'power_saving_frame'):
@@ -5473,7 +5474,7 @@ class ControllerWindow:
                 placeholder.transient(self.root)
                 tk.Label(
                     placeholder,
-                    text="Loading Ko-fi…",
+                    text=tr("Loading Ko-fi…"),
                     bg=_PAGE_BG,
                     fg="#8a8a8a",
                     font=scale_font(("Segoe UI", 11)),
@@ -6138,7 +6139,7 @@ class ControllerWindow:
                     status_color = "#888888"
 
         self.header_label.config(
-            text=f"Connecting Via: {conn_method}  |  Status: {conn_status}",
+            text=tr(f"Connecting Via: {conn_method}  |  Status: {conn_status}"),
             fg=status_color,
         )
         # Track whether we were in bridge_ready for next poll's disconnect detection
@@ -6187,14 +6188,14 @@ class ControllerWindow:
             winuhid_state = get_winuhid_status(use_cache=True).state
             text = ("Uninstall WinUHid Driver" if winuhid_state == WINUHID_HEALTHY
                     else "Install WinUHid Driver")
-        self.driver_btn.config(text=text)
+        self.driver_btn.config(text=tr(text))
         self.update_driver_buttons_visibility()
 
     def update_usbip_button(self):
         if not hasattr(self, 'usbip_btn') or not self.usbip_btn:
             return
         if getattr(self, "_usbip_restart_pending", False):
-            self.usbip_btn.config(text="Restart Required")
+            self.usbip_btn.config(text=tr("Restart Required"))
             self.update_driver_buttons_visibility()
             return
         # Only a genuinely half-installed driver offers "Repair"; USBIP_UNKNOWN
@@ -6203,7 +6204,7 @@ class ControllerWindow:
         text = ("Uninstall USBIP Driver" if usbip_state == USBIP_HEALTHY
                 else "Repair USBIP Driver" if usbip_state == USBIP_PARTIAL
                 else "Install USBIP Driver")
-        self.usbip_btn.config(text=text)
+        self.usbip_btn.config(text=tr(text))
         self.update_driver_buttons_visibility()
 
     def on_usbip_btn_clicked(self):
@@ -6256,7 +6257,7 @@ class ControllerWindow:
         if os.path.exists(install_payload):
             try:
                 progress_win = tk.Toplevel(self.root)
-                progress_win.title("USBIP Driver Installation")
+                progress_win.title(tr("USBIP Driver Installation"))
                 progress_w = int(450 * scaling_factor)
                 progress_h = int(130 * scaling_factor)
                 progress_win.resizable(False, False)
@@ -6267,7 +6268,7 @@ class ControllerWindow:
                 
                 label = tk.Label(
                     progress_win,
-                    text="Installing USBIP-win2 Driver...\nPlease authorize the UAC prompt if asked.",
+                    text=tr("Installing USBIP-win2 Driver...\nPlease authorize the UAC prompt if asked."),
                     fg="white", bg="#1E1E1E",
                     font=scale_font(("Arial", 11, "bold"))
                 )
@@ -6341,7 +6342,7 @@ class ControllerWindow:
                             ctypes.windll.kernel32.GetExitCodeProcess(hProcess, ctypes.byref(exit_code))
                             ctypes.windll.kernel32.CloseHandle(hProcess)
                             proc_exit_code[0] = exit_code.value
-                            label.config(text="Finalizing USBIP-win2 Driver installation...")
+                            label.config(text=tr("Finalizing USBIP-win2 Driver installation..."))
                             finish_verification()
                     else:
                         progress_win.grab_release()
@@ -6442,7 +6443,7 @@ class ControllerWindow:
         proc_exit_code = [None]
         try:
             progress_win = tk.Toplevel(self.root)
-            progress_win.title("USBIP Driver Uninstallation")
+            progress_win.title(tr("USBIP Driver Uninstallation"))
             progress_w = int(450 * scaling_factor)
             progress_h = int(130 * scaling_factor)
             progress_win.resizable(False, False)
@@ -6453,9 +6454,9 @@ class ControllerWindow:
 
             tk.Label(
                 progress_win,
-                text=("Recovering incomplete USBIP installation..." if recovery_script
-                      else "Running USBIP-win2 Uninstaller...")
-                     + "\nPlease authorize the UAC prompt if asked.",
+                text=tr(("Recovering incomplete USBIP installation..." if recovery_script
+                         else "Running USBIP-win2 Uninstaller...")
+                        + "\nPlease authorize the UAC prompt if asked."),
                 fg="white", bg="#1E1E1E",
                 font=scale_font(("Arial", 11, "bold"))
             ).pack(pady=int(40 * scaling_factor))
@@ -6517,7 +6518,7 @@ class ControllerWindow:
         # driver, services and device node are expected to remain until reboot.
         self._usbip_restart_pending = True
         if hasattr(self, "usbip_btn") and self.usbip_btn:
-            self.usbip_btn.config(text="Restart Required")
+            self.usbip_btn.config(text=tr("Restart Required"))
 
         if discoverer_was_running:
             self.start_discoverer_thread()
@@ -6555,7 +6556,7 @@ class ControllerWindow:
         GYRO_PHASE0_RECORDER.set_monitoring(True)
         popup = tk.Toplevel(self.root)
         self.mag_tester_window = popup
-        popup.title("Mag Tester")
+        popup.title(tr("Mag Tester"))
         popup.configure(bg=background_color)
         popup.resizable(False, False)
         popup.transient(self.root)
@@ -6566,12 +6567,12 @@ class ControllerWindow:
                      pady=int(12 * scaling_factor))
 
         indicators = tk.LabelFrame(
-            content, text="Real-time Indicators", bg=background_color,
+            content, text=tr("Real-time Indicators"), bg=background_color,
             fg=text_color, bd=1, relief=tk.GROOVE,
             font=scale_font(("Arial", 11, "bold")))
         indicators.pack(fill=tk.X)
 
-        tk.Label(indicators, text="Controller:", bg=background_color,
+        tk.Label(indicators, text=tr("Controller:"), bg=background_color,
                  fg=text_color, font=scale_font(("Arial", 10, "bold"))).grid(
                      row=0, column=0, sticky="e", padx=8, pady=(8, 4))
         self.mag_tester_controller_var = tk.StringVar(value="")
@@ -6596,12 +6597,12 @@ class ControllerWindow:
         )
         self.mag_tester_values = {}
         for row_index, (key, title) in enumerate(rows, start=1):
-            tk.Label(indicators, text=f"{title}:", bg=background_color,
+            tk.Label(indicators, text=tr(f"{title}:"), bg=background_color,
                      fg=text_color,
                      font=scale_font(("Arial", 10, "bold"))).grid(
                          row=row_index, column=0, sticky="e", padx=8, pady=2)
             value = tk.Label(
-                indicators, text="Waiting for controller data",
+                indicators, text=tr("Waiting for controller data"),
                 bg=background_color, fg="#AAAAAA", anchor="w",
                 justify=tk.LEFT, width=68,
                 font=scale_font(("Consolas", 10)))
@@ -6615,13 +6616,13 @@ class ControllerWindow:
             highlightcolor="#ff453a", highlightthickness=0, bd=0)
         self.mag_tester_record_border.pack(side=tk.LEFT)
         self.mag_tester_record_button = tk.Button(
-            self.mag_tester_record_border, text="Start Recording",
+            self.mag_tester_record_border, text=tr("Start Recording"),
             command=self._toggle_mag_tester_recording,
             bg=button_gray, fg="white", bd=0, relief=tk.FLAT,
             font=scale_font(("Arial", 10, "bold")))
         self.mag_tester_record_button.pack(padx=2, pady=2)
         self.mag_tester_export_button = tk.Button(
-            controls, text="Export Recorded File",
+            controls, text=tr("Export Recorded File"),
             command=self._export_mag_tester_recording,
             bg=button_gray, fg="white", bd=0, relief=tk.FLAT,
             state=(tk.NORMAL if self.mag_tester_last_recording else tk.DISABLED),
@@ -6629,7 +6630,7 @@ class ControllerWindow:
         self.mag_tester_export_button.pack(side=tk.LEFT, padx=(10, 0))
 
         self.mag_tester_file_label = tk.Label(
-            content, text="No recording in this session.",
+            content, text=tr("No recording in this session."),
             bg=background_color, fg="#888888", anchor="w",
             justify=tk.LEFT, height=2,
             wraplength=int(930 * scaling_factor),
@@ -6660,8 +6661,8 @@ class ControllerWindow:
         border = getattr(self, "mag_tester_record_border", None)
         if button is None or border is None:
             return
-        button.config(text=("Stop Recording" if recording
-                            else "Start Recording"))
+        button.config(text=(tr("Stop Recording" if recording
+                            else "Start Recording")))
         border.config(highlightthickness=(2 if recording else 0))
         export = getattr(self, "mag_tester_export_button", None)
         if export is not None:
@@ -6701,7 +6702,7 @@ class ControllerWindow:
                 "Mag Tester", "Unable to start recording. Check the console log for details.")
             return
         self.mag_tester_last_recording = None
-        self.mag_tester_file_label.config(text=f"Recording: {path}")
+        self.mag_tester_file_label.config(text=tr(f"Recording: {path}"))
         self._set_mag_tester_recording_ui(True)
 
     def _finish_mag_tester_stop(self, path):
@@ -6712,12 +6713,12 @@ class ControllerWindow:
         path = os.fspath(path) if path is not None else ""
         if path and os.path.isfile(path):
             self.mag_tester_last_recording = path
-            self.mag_tester_file_label.config(text=f"Recorded: {path}")
+            self.mag_tester_file_label.config(text=tr(f"Recorded: {path}"))
         else:
-            self.mag_tester_file_label.config(text="Recording did not create a file.")
+            self.mag_tester_file_label.config(text=tr("Recording did not create a file."))
         error = GYRO_PHASE0_RECORDER.writer_error
         if error is not None:
-            self.mag_tester_file_label.config(text=f"Recording error: {error}")
+            self.mag_tester_file_label.config(text=tr(f"Recording error: {error}"))
         self._set_mag_tester_recording_ui(False)
 
     def _export_mag_tester_recording(self):
@@ -6729,7 +6730,7 @@ class ControllerWindow:
         try:
             destination = filedialog.asksaveasfilename(
                 parent=self.mag_tester_window or self.root,
-                title="Choose Export Location",
+                title=tr("Choose Export Location"),
                 defaultextension=".txt",
                 filetypes=[("Text files", "*.txt")],
                 initialfile=os.path.basename(source))
@@ -6744,7 +6745,7 @@ class ControllerWindow:
             self.mag_tester_last_recording = None
             self.mag_tester_export_button.config(state=tk.DISABLED)
             self.mag_tester_file_label.config(
-                text=f"Exported: {exported}\nTemporary recording removed.")
+                text=tr(f"Exported: {exported}\nTemporary recording removed."))
         except Exception as exc:
             self.show_centered_message("Mag Tester", f"Export failed: {exc}")
 
@@ -6897,7 +6898,7 @@ class ControllerWindow:
             for key, label in self.mag_tester_values.items():
                 value = values[key]
                 label.config(
-                    text=value, fg=self._mag_tester_value_color(value))
+                    text=tr(value), fg=self._mag_tester_value_color(value))
         self.mag_tester_refresh_after_id = popup.after(
             150, self._refresh_mag_tester)
 
@@ -6973,7 +6974,7 @@ class ControllerWindow:
         except: pass
         # Window title is always the branded name (the executable file name stays
         # Switch2Connect.exe; the MSIX Store DisplayName is also "Switch 2 Connect").
-        self.root.title("Switch 2 Connect")
+        self.root.title(tr("Switch 2 Connect"))
         
         # 3. Handle window geometry & minsize (remembering position)
         desired_w = int(
@@ -7097,7 +7098,7 @@ class ControllerWindow:
         self.header_frame.pack_propagate(False)
         self.version_label = tk.Label(
             self.header_frame,
-            text=APP_VERSION,
+            text=tr(APP_VERSION),
             fg="#FFFFFF",
             bg=background_color,
             font=scale_font(("Arial", 9, "bold")),
@@ -7107,7 +7108,7 @@ class ControllerWindow:
         if MAG_TESTER_BUILD_ENABLED:
             self.mag_tester_button = tk.Button(
                 self.header_frame,
-                text="Mag Tester",
+                text=tr("Mag Tester"),
                 command=self.open_mag_tester,
                 bg=button_gray,
                 fg="white",
@@ -7123,7 +7124,7 @@ class ControllerWindow:
 
         self.header_label = tk.Label(
             self.header_frame,
-            text="Connecting Via: System BLE  |  Status: Ready",
+            text=tr("Connecting Via: System BLE  |  Status: Ready"),
             fg="#888888",
             bg=background_color,
             font=scale_font(("Arial", 9, "bold")),
@@ -7190,12 +7191,12 @@ class ControllerWindow:
 
         # Driver Install/Uninstall Button
         self.driver_frame = tk.Frame(self.top_btn_frame, bg=button_gray)
-        self.driver_btn = tk.Button(self.driver_frame, text="", bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=self.on_driver_btn_clicked)
+        self.driver_btn = tk.Button(self.driver_frame, text=tr(""), bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=self.on_driver_btn_clicked)
         self.driver_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
         # USBIP Driver Button
         self.usbip_frame = tk.Frame(self.top_btn_frame, bg=button_gray)
-        self.usbip_btn = tk.Button(self.usbip_frame, text="", bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=self.on_usbip_btn_clicked)
+        self.usbip_btn = tk.Button(self.usbip_frame, text=tr(""), bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=self.on_usbip_btn_clicked)
         self.usbip_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
         # Wired controller settings button (re-labelled per connected pad by
@@ -7203,7 +7204,7 @@ class ControllerWindow:
         self.wired_pro_settings_frame = tk.Frame(self.top_btn_frame, bg=button_gray)
         self.wired_pro_settings_btn = tk.Button(
             self.wired_pro_settings_frame,
-            text=self.wired_controller_label(),
+            text=tr(self.wired_controller_label()),
             bg=button_gray,
             fg=text_color,
             bd=0,
@@ -7216,7 +7217,7 @@ class ControllerWindow:
         self.power_saving_frame = tk.Frame(self.top_btn_frame, bg=button_gray)
         self.power_saving_btn = tk.Button(
             self.power_saving_frame,
-            text=f"Power Saving: {getattr(CONFIG, 'power_saving_mode', 'Off')}",
+            text=tr(f"Power Saving: {getattr(CONFIG, 'power_saving_mode', 'Off')}"),
             bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT,
             font=scale_font(("Arial", 10, "bold")),
             command=self.cycle_power_saving_mode)
@@ -7226,7 +7227,7 @@ class ControllerWindow:
         self.esp32s3_frame = tk.Frame(self.top_btn_frame, bg=button_gray)
         self.esp32s3_btn = tk.Button(
             self.esp32s3_frame,
-            text="ESP32-S3 N16R8 Driver",
+            text=tr("ESP32-S3 N16R8 Driver"),
             bg=button_gray,
             fg=text_color,
             bd=0,
@@ -7240,7 +7241,7 @@ class ControllerWindow:
         self.hidhide_frame = tk.Frame(self.top_btn_frame, bg=button_gray)
         self.hidhide_btn = tk.Button(
             self.hidhide_frame,
-            text=f"{self.wired_controller_label()} Driver",
+            text=tr(f"{self.wired_controller_label()} Driver"),
             bg=button_gray,
             fg=text_color,
             bd=0,
@@ -7254,20 +7255,20 @@ class ControllerWindow:
         self.startup_frame = tk.Frame(self.top_btn_frame, bg=highlight_color if CONFIG.open_when_startup else button_gray)
         self.startup_frame.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
         startup_text = f"Run At Startup: {'ON' if CONFIG.open_when_startup else 'OFF'}"
-        self.startup_btn = tk.Button(self.startup_frame, text=startup_text, bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=lambda: self.update_startup_setting(not CONFIG.open_when_startup))
+        self.startup_btn = tk.Button(self.startup_frame, text=tr(startup_text), bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=lambda: self.update_startup_setting(not CONFIG.open_when_startup))
         self.startup_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
         # Minimized Button
         self.min_frame = tk.Frame(self.top_btn_frame, bg=highlight_color if CONFIG.start_minimized else button_gray)
         self.min_frame.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
         minimized_text = f"Start Minimized: {'ON' if CONFIG.start_minimized else 'OFF'}"
-        self.minimized_btn = tk.Button(self.min_frame, text=minimized_text, bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=lambda: self.update_minimized_setting(not CONFIG.start_minimized))
+        self.minimized_btn = tk.Button(self.min_frame, text=tr(minimized_text), bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=lambda: self.update_minimized_setting(not CONFIG.start_minimized))
         self.minimized_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
         # Hide Button
         self.hide_frame = tk.Frame(self.top_btn_frame, bg=button_gray)
         self.hide_frame.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
-        self.hide_btn = tk.Button(self.hide_frame, text="Hide to System Tray", bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=self.hide_to_tray)
+        self.hide_btn = tk.Button(self.hide_frame, text=tr("Hide to System Tray"), bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), command=self.hide_to_tray)
         self.hide_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
 
@@ -7748,11 +7749,11 @@ class ControllerWindow:
         row = tk.Frame(self.ui_scale_footer, bg=background_color, padx=0, pady=0)
         row.pack(expand=True, padx=0, pady=0, ipadx=0, ipady=0)
         tk.Label(
-            row, text="UI Scaling:", bg=background_color, fg=text_color,
+            row, text=tr("UI Scaling:"), bg=background_color, fg=text_color,
             font=scale_font(("Arial", 10, "bold"))).pack(
                 side=tk.LEFT, padx=0, pady=0)
         self.ui_scale_value_label = tk.Label(
-            row, text=f"{_normalized_user_ui_scale():.1f}",
+            row, text=tr(f"{_normalized_user_ui_scale():.1f}"),
             width=3, bg=background_color, fg=text_color,
             font=scale_font(("Arial", 10, "bold")))
         self._initializing_ui_scale = True
@@ -7960,7 +7961,7 @@ class ControllerWindow:
     def _on_ui_scale_slider(self, value):
         value = _normalized_user_ui_scale(value)
         try:
-            self.ui_scale_value_label.configure(text=f"{value:.1f}")
+            self.ui_scale_value_label.configure(text=tr(f"{value:.1f}"))
         except (AttributeError, tk.TclError):
             pass
         if getattr(self, "_initializing_ui_scale", False):
@@ -7984,7 +7985,7 @@ class ControllerWindow:
         self._ui_scale_mouse_dragging = False
         try:
             value = _normalized_user_ui_scale(self.ui_scale_slider.get())
-            self.ui_scale_value_label.configure(text=f"{value:.1f}")
+            self.ui_scale_value_label.configure(text=tr(f"{value:.1f}"))
             self._schedule_user_ui_scale(value, apply_delay=0)
         except (AttributeError, tk.TclError):
             pass
@@ -8606,18 +8607,18 @@ class ControllerWindow:
     def init_compensation_panel(self, parent=None):
         parent = parent or self.root
         panel_bg = parent.cget("bg") if parent is not self.root else background_color
-        self.comp_frame = tk.LabelFrame(parent, text=" Gyro Pass-Through ", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")), padx=int(10 * scaling_factor), pady=int(10 * scaling_factor))
+        self.comp_frame = tk.LabelFrame(parent, text=tr(" Gyro Pass-Through "), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")), padx=int(10 * scaling_factor), pady=int(10 * scaling_factor))
         if parent is self.root:
             self.comp_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=int(5 * scaling_factor))
         
-        tk.Label(self.comp_frame, text="9-axis Assist:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=0, padx=int(5 * scaling_factor), sticky="e")
+        tk.Label(self.comp_frame, text=tr("9-axis Assist:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=0, padx=int(5 * scaling_factor), sticky="e")
         self.stabilized_gyro_switch = ToggleSwitch(self.comp_frame, labels=["ON", "OFF"], values=[True, False], initial_value=getattr(CONFIG, "gyro_passthrough_9axis_enabled", False), command=self.update_stabilized_gyro_setting, bg_color=panel_bg)
         self.stabilized_gyro_switch.grid(row=0, column=1, columnspan=2, padx=int(5 * scaling_factor), sticky="w")
-        tk.Label(self.comp_frame, text="Horizon Lock:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=3, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
+        tk.Label(self.comp_frame, text=tr("Horizon Lock:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=3, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
         self.steam_roll_comp_switch = ToggleSwitch(self.comp_frame, labels=["ON", "OFF"], values=[True, False], initial_value=getattr(CONFIG, "steam_roll_compensation", False), command=self.update_steam_roll_comp_setting, bg_color=panel_bg)
         self.steam_roll_comp_switch.grid(row=0, column=4, columnspan=2, padx=int(5 * scaling_factor), sticky="w")
 
-        tk.Label(self.comp_frame, text="Deadzone:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=6, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
+        tk.Label(self.comp_frame, text=tr("Deadzone:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=6, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
         self.deadzone_scale = tk.Scale(
             self.comp_frame,
             from_=0.0,
@@ -8640,13 +8641,13 @@ class ControllerWindow:
         self.deadzone_scale.set(getattr(CONFIG, "virtual_gyro_soft_deadzone", 0.0))
         self.deadzone_scale.grid(row=0, column=7, columnspan=2, padx=int(5 * scaling_factor), sticky="w")
 
-        tk.Label(self.comp_frame, text="Mode:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=1, column=0, padx=int(5 * scaling_factor), pady=(int(5 * scaling_factor), 0), sticky="e")
+        tk.Label(self.comp_frame, text=tr("Mode:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=1, column=0, padx=int(5 * scaling_factor), pady=(int(5 * scaling_factor), 0), sticky="e")
         self.passthrough_mode_switch = ToggleSwitch(self.comp_frame, labels=["Default", "Cemuhook"], values=["Default", "Cemuhook"], 
 initial_value=getattr(CONFIG, "gyro_passthrough_mode", "Default"), command=self.update_passthrough_mode, 
 bg_color=panel_bg, widths=[8, 10])
         self.passthrough_mode_switch.grid(row=1, column=1, columnspan=2, padx=int(5 * scaling_factor), pady=(int(5 * scaling_factor), 0), sticky="w")
 
-        self.sens_label = tk.Label(self.comp_frame, text="Sensitivity:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")))
+        self.sens_label = tk.Label(self.comp_frame, text=tr("Sensitivity:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")))
         self.cemuhook_sens_scale = tk.Scale(
             self.comp_frame,
             from_=1,
@@ -8700,15 +8701,15 @@ bg_color=panel_bg, widths=[8, 10])
     def init_djg_panel(self, parent=None):
         parent = parent or self.root
         panel_bg = parent.cget("bg") if parent is not self.root else background_color
-        self.djg_frame = tk.LabelFrame(parent, text=" Dual Joy-con Gyro (DJG) ", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")), padx=int(10 * scaling_factor), pady=int(10 * scaling_factor))
+        self.djg_frame = tk.LabelFrame(parent, text=tr(" Dual Joy-con Gyro (DJG) "), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")), padx=int(10 * scaling_factor), pady=int(10 * scaling_factor))
         if parent is self.root:
             self.djg_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=int(5 * scaling_factor))
         
-        tk.Label(self.djg_frame, text="DJG:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=0, padx=int(5 * scaling_factor), sticky="e")
+        tk.Label(self.djg_frame, text=tr("DJG:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=0, padx=int(5 * scaling_factor), sticky="e")
         self.djg_enabled_switch = ToggleSwitch(self.djg_frame, labels=["ON", "OFF"], values=[True, False], initial_value=getattr(CONFIG, "djg_enabled", False), command=self.update_djg_enabled_setting, bg_color=panel_bg)
         self.djg_enabled_switch.grid(row=0, column=1, columnspan=2, padx=int(5 * scaling_factor), sticky="w")
         
-        self.djg_dominant_label = tk.Label(self.djg_frame, text="Dominant Side:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")))
+        self.djg_dominant_label = tk.Label(self.djg_frame, text=tr("Dominant Side:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")))
         self.djg_dominant_label.grid(row=0, column=3, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
         djg_dominant = getattr(CONFIG, "djg_dominant_side", "Right")
         self.djg_dominant_switch = ToggleSwitch(
@@ -8716,17 +8717,17 @@ bg_color=panel_bg, widths=[8, 10])
             initial_value=djg_dominant if djg_dominant in ("Left", "Right") else "Right",
             command=self.update_djg_dominant_setting, bg_color=panel_bg)
         self.djg_dominant_switch.grid(row=0, column=4, columnspan=2, padx=int(5 * scaling_factor), sticky="w")
-        self.djg_dominant_var = tk.StringVar(value=djg_dominant)
+        self.djg_dominant_var = LocalizedStringVar(value=djg_dominant, choices=("Left", "Right", "None"))
         self.djg_dominant_combo = ttk.Combobox(
             self.djg_frame, textvariable=self.djg_dominant_var,
-            values=["Left", "Right", "None"], state="readonly",
+            values=[tr("Left"), tr("Right"), tr("None")], state="readonly",
             font=scale_font(("Arial", 11, "bold")), width=6, justify="center")
         self.djg_dominant_combo.grid(row=0, column=4, columnspan=2, padx=int(5 * scaling_factor), sticky="w")
         self.djg_dominant_combo.bind(
             "<<ComboboxSelected>>",
             lambda e: self.update_djg_dominant_setting(self.djg_dominant_var.get()))
         
-        tk.Label(self.djg_frame, text="Mode:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=6, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
+        tk.Label(self.djg_frame, text=tr("Mode:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=6, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
         
         self.djg_mode_var = tk.StringVar(value=getattr(CONFIG, "djg_mode", "Single Side Toggle"))
         djg_modes = ["Switch Dominant Side", "Switch Gyro Side", "Single Side Toggle"]
@@ -8734,11 +8735,12 @@ bg_color=panel_bg, widths=[8, 10])
         # Calculate max width for dropdown
         max_mode_len = max(len(m) for m in djg_modes)
         
-        self.djg_mode_combo = ttk.Combobox(self.djg_frame, textvariable=self.djg_mode_var, values=djg_modes, state="readonly", font=scale_font(("Arial", 11, "bold")), width=max_mode_len, justify="center")
+        self.djg_mode_combo = LocalizedCombobox(self.djg_frame, values=djg_modes, state="readonly", font=scale_font(("Arial", 11, "bold")), width=max_mode_len, justify="center")
+        self.djg_mode_combo.set(self.djg_mode_var.get())
         self.djg_mode_combo.grid(row=0, column=7, padx=int(5 * scaling_factor), sticky="w")
-        self.djg_mode_combo.bind("<<ComboboxSelected>>", lambda e: self.update_djg_mode_setting(self.djg_mode_var.get()))
+        self.djg_mode_combo.bind("<<ComboboxSelected>>", lambda e: self.update_djg_mode_setting(self.djg_mode_combo.get()))
 
-        self.djg_activation_label = tk.Label(self.djg_frame, text="Activation:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")))
+        self.djg_activation_label = tk.Label(self.djg_frame, text=tr("Activation:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")))
         self.djg_activation_label.grid(row=0, column=8, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
         self.djg_activation_switch = ToggleSwitch(self.djg_frame, labels=["Hold", "Toggle"], values=["Hold", "Toggle"], initial_value=getattr(CONFIG, "djg_activation", "Toggle"), command=self.update_djg_activation_setting, bg_color=panel_bg)
         self.djg_activation_switch.grid(row=0, column=9, columnspan=2, padx=int(5 * scaling_factor), sticky="w")
@@ -8806,6 +8808,8 @@ bg_color=panel_bg, widths=[8, 10])
         logger.info(f"DJG Mode: {val}")
         if hasattr(self, "djg_mode_var"):
             self.djg_mode_var.set(val)
+            if hasattr(self, "djg_mode_combo"):
+                self.djg_mode_combo.set(val)
         self._apply_djg_mode_ui_state()
         self.force_refresh_player_slots()
 
@@ -8854,7 +8858,7 @@ bg_color=panel_bg, widths=[8, 10])
     def init_gyro_settings_panel(self, parent=None):
         parent = parent or self.root
         panel_bg = parent.cget("bg") if parent is not self.root else background_color
-        self.gyro_frame = tk.LabelFrame(parent, text=" In-app Gyro Mode ", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")), padx=int(10 * scaling_factor), pady=int(10 * scaling_factor))
+        self.gyro_frame = tk.LabelFrame(parent, text=tr(" In-app Gyro Mode "), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")), padx=int(10 * scaling_factor), pady=int(10 * scaling_factor))
         if parent is self.root:
             self.gyro_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=int(5 * scaling_factor))
 
@@ -8864,47 +8868,47 @@ bg_color=panel_bg, widths=[8, 10])
         self.calib_frame.pack(side=tk.LEFT)
         self.calib_button_frame = tk.Frame(self.calib_frame, bg=button_gray)
         self.calib_button_frame.pack(side=tk.LEFT)
-        self.calibrate_btn = tk.Button(self.calib_button_frame, text="Calibrate Gyro", command=self.on_calibrate_clicked, bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 11, "bold")))
+        self.calibrate_btn = tk.Button(self.calib_button_frame, text=tr("Calibrate Gyro"), command=self.on_calibrate_clicked, bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 11, "bold")))
         self.calibrate_btn.pack(side=tk.LEFT, padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
 
-        self.calib_hint_label = tk.Label(self.calib_frame, text="Keep controller stationary\nbefore calibrating.", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")), justify=tk.LEFT)
+        self.calib_hint_label = tk.Label(self.calib_frame, text=tr("Keep controller stationary\nbefore calibrating."), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")), justify=tk.LEFT)
         self.calib_hint_label.pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(2 * scaling_factor)), pady=int(2 * scaling_factor))
 
         mag_hint_frame = tk.Frame(self.gyro_frame, bg=panel_bg)
 
         l1 = tk.Frame(mag_hint_frame, bg=panel_bg)
         l1.pack(side=tk.TOP, anchor="w")
-        tk.Label(l1, text="Calibrate Mag (Mag Cal): Move controller in a", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT)
+        tk.Label(l1, text=tr("Calibrate Mag (Mag Cal): Move controller in a"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT)
 
         l2 = tk.Frame(mag_hint_frame, bg=panel_bg)
         l2.pack(side=tk.TOP, anchor="w")
 
-        lnk = tk.Label(l2, text="'figure 8'", bg=panel_bg, fg=highlight_color, font=scale_font(("Arial", 11, "bold", "underline")), cursor="hand2")
+        lnk = tk.Label(l2, text=tr("'figure 8'"), bg=panel_bg, fg=highlight_color, font=scale_font(("Arial", 11, "bold", "underline")), cursor="hand2")
         lnk.pack(side=tk.LEFT)
         lnk.bind("<Button-1>", lambda e: (logger.info(f"Opening YouTube link via webbrowser..."), webbrowser.open("https://youtu.be/J_cZnPcW-Yw?si=ID2vdzURiOph8x77&t=6")))
 
-        tk.Label(l2, text=" pattern during calibration.", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT)
+        tk.Label(l2, text=tr(" pattern during calibration."), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT)
 
         # ---- Row 1: Gyro Control + Sensitivity + Calibrate Gyro ----
-        tk.Label(self.gyro_frame, text="Gyro Control:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=1, column=0, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="e")
+        tk.Label(self.gyro_frame, text=tr("Gyro Control:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=1, column=0, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="e")
         initial_gyro_control = "Steering" if getattr(CONFIG, "gyro_mode", "World") == "Roll" else getattr(CONFIG, "gyro_control_mode", "Mouse")
         self.gyro_control_switch = ToggleSwitch(self.gyro_frame, labels=["Mouse", "R Joystick", "Steering"], values=["Mouse", "R Joystick", "Steering"], initial_value=initial_gyro_control, command=self.update_gyro_control_mode, bg_color=panel_bg)
         self.gyro_control_switch.grid(row=1, column=1, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="w")
-        tk.Label(self.gyro_frame, text="Sensitivity:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=1, column=2, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), pady=(int(10 * scaling_factor), 0), sticky="e")
+        tk.Label(self.gyro_frame, text=tr("Sensitivity:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=1, column=2, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), pady=(int(10 * scaling_factor), 0), sticky="e")
         self.sens_scale = tk.Scale(self.gyro_frame, from_=1, to=10, resolution=0.2, orient=tk.HORIZONTAL, length=int(120 * scaling_factor), bg=panel_bg, fg=text_color, troughcolor=button_gray, activebackground=highlight_color, highlightthickness=0, bd=0, sliderrelief=tk.FLAT, sliderlength=int(15 * scaling_factor), width=int(15 * scaling_factor), font=scale_font(("Arial", 11, "bold")), command=self.on_gyro_setting_changed)
         self.sens_scale.set(self._current_gyro_control_sensitivity())
         self.sens_scale.grid(row=1, column=3, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="w")
         gyro_calib_row.grid(row=1, column=4, columnspan=3, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), pady=(int(10 * scaling_factor), 0), sticky="w")
 
         # ---- Row 2: Mode + Deadzone + Mag Cal hint ----
-        tk.Label(self.gyro_frame, text="Mode:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=2, column=0, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="e")
+        tk.Label(self.gyro_frame, text=tr("Mode:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=2, column=0, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="e")
         self.gyro_mode_switch = ToggleSwitch(self.gyro_frame, labels=["9-Axis", "6-Axis"], values=["World", "Yaw"], initial_value=(CONFIG.gyro_mode if CONFIG.gyro_mode in ("World", "Yaw") else "World"), command=self.update_mode_setting, bg_color=panel_bg)
         self.gyro_mode_switch.grid(row=2, column=1, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="w")
-        tk.Label(self.gyro_frame, text="Deadzone:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=2, column=2, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), pady=(int(10 * scaling_factor), 0), sticky="e")
+        tk.Label(self.gyro_frame, text=tr("Deadzone:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=2, column=2, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), pady=(int(10 * scaling_factor), 0), sticky="e")
         mag_hint_frame.grid(row=2, column=4, columnspan=3, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), pady=(int(10 * scaling_factor), 0), sticky="w")
 
         # ---- Row 3: Mode Shift + Stick Assist ----
-        tk.Label(self.gyro_frame, text="Mode Shift:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=3, column=0, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="e")
+        tk.Label(self.gyro_frame, text=tr("Mode Shift:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=3, column=0, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="e")
         self.mode_shift_switch = ToggleSwitch(self.gyro_frame, labels=["On", "Off"], values=[True, False], initial_value=CONFIG.mode_shift_enabled, command=self.update_mode_shift_setting, bg_color=panel_bg)
         self.mode_shift_switch.grid(row=3, column=1, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="w")
 
@@ -8930,7 +8934,7 @@ bg_color=panel_bg, widths=[8, 10])
         self.in_app_deadzone_scale.set(getattr(CONFIG, "in_app_gyro_soft_deadzone", 0.0))
         self.in_app_deadzone_scale.grid(row=2, column=3, padx=int(5 * scaling_factor), pady=(int(10 * scaling_factor), 0), sticky="w")
 
-        self.stick_assist_label = tk.Label(self.gyro_frame, text="Stick Assist:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")))
+        self.stick_assist_label = tk.Label(self.gyro_frame, text=tr("Stick Assist:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold")))
         self.stick_assist_label.grid(row=3, column=2, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), pady=(int(10 * scaling_factor), 0), sticky="e")
         self.stick_scale = tk.Scale(self.gyro_frame, from_=0, to=10, resolution=0.2, orient=tk.HORIZONTAL, length=int(120 * scaling_factor), bg=panel_bg, fg=text_color, troughcolor=button_gray, activebackground=highlight_color, highlightthickness=0, bd=0, sliderrelief=tk.FLAT, sliderlength=int(15 * scaling_factor), width=int(15 * scaling_factor), font=scale_font(("Arial", 11, "bold")), command=self.on_gyro_setting_changed)
         self.stick_scale.set(getattr(CONFIG, "stick_mouse_sensitivity", 5.0))
@@ -8940,7 +8944,7 @@ bg_color=panel_bg, widths=[8, 10])
         # On = one extra In-app Gyro Tap trigger in the shared trigger pool; pressing On
         # also opens the In-app Gyro settings popup (Deadzone / Dampening) for it.
         always_active_frame = tk.Frame(self.gyro_frame, bg=panel_bg)
-        tk.Label(always_active_frame, text="Always Active:", bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(0, int(5 * scaling_factor)))
+        tk.Label(always_active_frame, text=tr("Always Active:"), bg=panel_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(0, int(5 * scaling_factor)))
         self.gyro_always_active_switch = ToggleSwitch(always_active_frame, labels=["On", "Off"], values=[True, False], initial_value=bool(getattr(CONFIG, "gyro_always_active", False)), command=self.update_gyro_always_active_setting, bg_color=panel_bg)
         self.gyro_always_active_switch.pack(side=tk.LEFT)
         # Pressing On must always open the popup (and re-assert On), even when On is
@@ -8954,14 +8958,14 @@ bg_color=panel_bg, widths=[8, 10])
 
     def init_auto_disconnect_panel(self):
         parent = getattr(self, "scroll_content_frame", self.root)
-        self.auto_disconnect_frame = tk.LabelFrame(parent, text=" Auto Disconnect ", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")), padx=int(10 * scaling_factor), pady=int(10 * scaling_factor))
+        self.auto_disconnect_frame = tk.LabelFrame(parent, text=tr(" Auto Disconnect "), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")), padx=int(10 * scaling_factor), pady=int(10 * scaling_factor))
         self.auto_disconnect_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=int(5 * scaling_factor))
         
-        tk.Label(self.auto_disconnect_frame, text="Auto Disconnect:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=0, padx=int(5 * scaling_factor), sticky="e")
+        tk.Label(self.auto_disconnect_frame, text=tr("Auto Disconnect:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=0, padx=int(5 * scaling_factor), sticky="e")
         self.auto_disconnect_switch = ToggleSwitch(self.auto_disconnect_frame, labels=["OFF", "Inactive", "Absolute"], values=["OFF", "Inactive", "Absolute"], initial_value=getattr(CONFIG, "auto_disconnect_mode", "OFF"), command=self.update_auto_disconnect_mode, bg_color=background_color)
         self.auto_disconnect_switch.grid(row=0, column=1, padx=int(5 * scaling_factor), sticky="w")
         
-        tk.Label(self.auto_disconnect_frame, text="Disconnect after:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=2, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
+        tk.Label(self.auto_disconnect_frame, text=tr("Disconnect after:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=2, padx=(int(20 * scaling_factor), int(5 * scaling_factor)), sticky="e")
         
         # Validation to only allow digits in time entries
         def validate_numeric(char):
@@ -8973,21 +8977,21 @@ bg_color=panel_bg, widths=[8, 10])
         self.day_entry.insert(0, str(getattr(CONFIG, "auto_disconnect_days", 0)))
         self.day_entry.grid(row=0, column=3, padx=int(2 * scaling_factor))
         self.day_entry.is_time_entry = True
-        tk.Label(self.auto_disconnect_frame, text="Day", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=4, padx=(0, int(10 * scaling_factor)), sticky="w")
+        tk.Label(self.auto_disconnect_frame, text=tr("Day"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=4, padx=(0, int(10 * scaling_factor)), sticky="w")
         
         # Hour Entry
         self.hour_entry = tk.Entry(self.auto_disconnect_frame, width=4, bg=button_gray, fg=text_color, insertbackground=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 11, "bold")), justify=tk.CENTER, validate="key", validatecommand=vcmd)
         self.hour_entry.insert(0, str(getattr(CONFIG, "auto_disconnect_hours", 0)))
         self.hour_entry.grid(row=0, column=5, padx=int(2 * scaling_factor))
         self.hour_entry.is_time_entry = True
-        tk.Label(self.auto_disconnect_frame, text="Hour", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=6, padx=(0, int(10 * scaling_factor)), sticky="w")
+        tk.Label(self.auto_disconnect_frame, text=tr("Hour"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=6, padx=(0, int(10 * scaling_factor)), sticky="w")
         
         # Minute Entry
         self.minute_entry = tk.Entry(self.auto_disconnect_frame, width=4, bg=button_gray, fg=text_color, insertbackground=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 11, "bold")), justify=tk.CENTER, validate="key", validatecommand=vcmd)
         self.minute_entry.insert(0, str(getattr(CONFIG, "auto_disconnect_minutes", 0)))
         self.minute_entry.grid(row=0, column=7, padx=int(2 * scaling_factor))
         self.minute_entry.is_time_entry = True
-        tk.Label(self.auto_disconnect_frame, text="Minute", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=8, padx=(0, int(10 * scaling_factor)), sticky="w")
+        tk.Label(self.auto_disconnect_frame, text=tr("Minute"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).grid(row=0, column=8, padx=(0, int(10 * scaling_factor)), sticky="w")
         
         # Bind events
         self.day_entry.bind("<KeyRelease>", self.on_auto_disconnect_time_changed)
@@ -9280,28 +9284,28 @@ bg_color=panel_bg, widths=[8, 10])
     def on_calibrate_clicked(self):
         if not hasattr(self, 'current_controllers') or self.no_controllers: return
         
-        self.calibrate_btn.config(state=tk.DISABLED, text="Starting in 3..", fg="#ffffff", disabledforeground="#ffffff")
+        self.calibrate_btn.config(state=tk.DISABLED, text=tr("Starting in 3.."), fg="#ffffff", disabledforeground="#ffffff")
         self.calib_button_frame.config(bg=highlight_color)
         self.calibrate_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
         
-        self.root.after(1000, lambda: self.calibrate_btn.config(text="Starting in 2..", fg="#ffffff", disabledforeground="#ffffff"))
-        self.root.after(2000, lambda: self.calibrate_btn.config(text="Starting in 1..", fg="#ffffff", disabledforeground="#ffffff"))
+        self.root.after(1000, lambda: self.calibrate_btn.config(text=tr("Starting in 2.."), fg="#ffffff", disabledforeground="#ffffff"))
+        self.root.after(2000, lambda: self.calibrate_btn.config(text=tr("Starting in 1.."), fg="#ffffff", disabledforeground="#ffffff"))
         
         def start_actual_calibration():
             for vc in self.current_controllers:
                 if vc is not None: vc.start_calibration()
                 
-            self.calibrate_btn.config(text="Calibrating 5..", fg="#ffffff", disabledforeground="#ffffff")
+            self.calibrate_btn.config(text=tr("Calibrating 5.."), fg="#ffffff", disabledforeground="#ffffff")
             self.calib_button_frame.config(bg=highlight_color)
             self.calibrate_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
             
-            self.root.after(1000, lambda: self.calibrate_btn.config(text="Calibrating 4..", fg="#ffffff", disabledforeground="#ffffff"))
-            self.root.after(2000, lambda: self.calibrate_btn.config(text="Calibrating 3..", fg="#ffffff", disabledforeground="#ffffff"))
-            self.root.after(3000, lambda: self.calibrate_btn.config(text="Calibrating 2..", fg="#ffffff", disabledforeground="#ffffff"))
-            self.root.after(4000, lambda: self.calibrate_btn.config(text="Calibrating 1..", fg="#ffffff", disabledforeground="#ffffff"))
+            self.root.after(1000, lambda: self.calibrate_btn.config(text=tr("Calibrating 4.."), fg="#ffffff", disabledforeground="#ffffff"))
+            self.root.after(2000, lambda: self.calibrate_btn.config(text=tr("Calibrating 3.."), fg="#ffffff", disabledforeground="#ffffff"))
+            self.root.after(3000, lambda: self.calibrate_btn.config(text=tr("Calibrating 2.."), fg="#ffffff", disabledforeground="#ffffff"))
+            self.root.after(4000, lambda: self.calibrate_btn.config(text=tr("Calibrating 1.."), fg="#ffffff", disabledforeground="#ffffff"))
             
             self.root.after(5000, lambda: (
-                self.calibrate_btn.config(state=tk.NORMAL, text="Calibration Done"), 
+                self.calibrate_btn.config(state=tk.NORMAL, text=tr("Calibration Done")),
                 self.calib_button_frame.config(bg=button_gray), 
                 self.calibrate_btn.pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
             ))
@@ -9558,7 +9562,7 @@ bg_color=panel_bg, widths=[8, 10])
         is_in_app_simul = key.endswith("_in_app_gyro_simul")
         parent_bg = parent.cget("bg") if hasattr(parent, "cget") else background_color
         if label_text:
-            tk.Label(parent, text=label_text, bg=parent_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(2 * scaling_factor)))
+            tk.Label(parent, text=tr(label_text), bg=parent_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(2 * scaling_factor)))
         container = tk.Frame(parent, bg=parent_bg)
         if fixed_size is not None:
             container.config(width=fixed_size[0], height=fixed_size[1])
@@ -9598,7 +9602,7 @@ bg_color=panel_bg, widths=[8, 10])
         def toggle_mode():
             new_mode = "Tap" if mode_var.get() == "Hold" else "Hold"
             mode_var.set(new_mode)
-            mode_btn.config(text=new_mode)
+            mode_btn.config(text=tr(new_mode))
             current_val = CONFIG.get_mapping_setting_scoped(key, "Default", mapping_scope)
             mouse_click_mapping = parse_mouse_click_mapping(current_val)
             if mouse_click_mapping:
@@ -9616,7 +9620,7 @@ bg_color=panel_bg, widths=[8, 10])
                 sync_joystick_direction(new_val)
                 self.on_setting_changed()
 
-        mode_btn = tk.Button(custom_frame, text="Hold", bg=button_gray, fg="white", font=scale_font(("Arial", 9, "bold")), bd=0, relief=tk.FLAT, command=toggle_mode, width=4)
+        mode_btn = tk.Button(custom_frame, text=tr("Hold"), bg=button_gray, fg="white", font=scale_font(("Arial", 9, "bold")), bd=0, relief=tk.FLAT, command=toggle_mode, width=4)
         mode_btn.pack(side=tk.LEFT, padx=(0, int(2 * scaling_factor)), fill=tk.Y)
         
         entry = RecordingEntry(custom_frame, normal_font=scale_font(("Arial", 11, "bold")), prefix_font=scale_font(("Arial", 8, "bold")), width=14 if is_in_app_simul else 11, bg=button_gray, fg="white")
@@ -9645,7 +9649,7 @@ bg_color=panel_bg, widths=[8, 10])
             mouse_click_btn.pack_forget()
             if reset_mode:
                 mode_var.set("Hold")
-                mode_btn.config(text="Hold")
+                mode_btn.config(text=tr("Hold"))
 
         def request_in_app_simul_reflow(force_base=False):
             if not is_in_app_simul:
@@ -9716,7 +9720,7 @@ bg_color=panel_bg, widths=[8, 10])
             custom_frame.pack_forget()
             cp_frame.pack_forget()
             mode_var.set("Hold")
-            mode_btn.config(text="Hold")
+            mode_btn.config(text=tr("Hold"))
             pack_combo()
             combo.set(reset_value)
             set_mapping_value(reset_value)
@@ -9732,7 +9736,7 @@ bg_color=panel_bg, widths=[8, 10])
                     self.focus_outline.update(combo)
                 except: pass
 
-        close_btn = tk.Button(custom_frame, text="X", bg="#ff4444", fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT, command=on_close)
+        close_btn = tk.Button(custom_frame, text=tr("X"), bg="#ff4444", fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT, command=on_close)
         def cancel_recording_on_close_press(_event=None):
             cancel_recording = getattr(self, "_cancel_custom_recording_without_commit", None)
             if callable(cancel_recording):
@@ -9750,7 +9754,7 @@ bg_color=panel_bg, widths=[8, 10])
         # "Change Profile" shows a button (opens an Auto/Manual popup) + X, like a
         # Joystick Custom mapping, instead of a plain combo selection.
         cp_frame = tk.Frame(container, bg=parent_bg)
-        cp_btn = tk.Button(cp_frame, text="Change Profile", bg=button_gray, fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT)
+        cp_btn = tk.Button(cp_frame, text=tr("Change Profile"), bg=button_gray, fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT)
         cp_btn.pack(side=tk.LEFT, fill=tk.Y)
         cp_btn.config(command=lambda: self.open_change_profile_popup(cp_btn))
 
@@ -9764,7 +9768,7 @@ bg_color=panel_bg, widths=[8, 10])
             clear_in_app_gyro_settings()
             self.on_setting_changed()
 
-        cp_close_btn = tk.Button(cp_frame, text="X", bg="#ff4444", fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT, command=cp_close)
+        cp_close_btn = tk.Button(cp_frame, text=tr("X"), bg="#ff4444", fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT, command=cp_close)
         cp_close_btn.pack(side=tk.LEFT, padx=(int(2 * scaling_factor), 0), fill=tk.Y)
 
         def show_change_profile(event=None):
@@ -9783,10 +9787,10 @@ bg_color=panel_bg, widths=[8, 10])
             if mode not in ("Hold", "Tap"):
                 mode = mode_var.get() if preserve_mode and mode_var.get() in ("Hold", "Tap") else "Hold"
             mode_var.set(mode)
-            mode_btn.config(text=mode)
+            mode_btn.config(text=tr(mode))
             value = f"Custom[{mode}]:{custom_token}"
             mouse_click_btn._mouse_click_token = option_token
-            mouse_click_btn.config(text=back_button_label(option_token))
+            mouse_click_btn.config(text=tr(back_button_label(option_token)))
             combo.pack_forget()
             render_action_button_mapping(
                 mouse_click_btn,
@@ -9833,7 +9837,7 @@ bg_color=panel_bg, widths=[8, 10])
                         elif simul_val == "PRTSC": display_str += " + PrtSc"
                         else: display_str += f" + {format_input_display(simul_val)}"
                 
-                in_app_gyro_btn.config(text=display_str)
+                in_app_gyro_btn.config(text=tr(display_str))
                 render_action_button_mapping(in_app_gyro_btn, include_close=True)
                 combo.set(IN_APP_GYRO_LABEL)
                 return
@@ -9845,15 +9849,15 @@ bg_color=panel_bg, widths=[8, 10])
 
                 if current_val.startswith("Custom[Tap]:"):
                     mode_var.set("Tap")
-                    mode_btn.config(text="Tap")
+                    mode_btn.config(text=tr("Tap"))
                     display_val = current_val[12:]
                 elif current_val.startswith("Custom[Hold]:"):
                     mode_var.set("Hold")
-                    mode_btn.config(text="Hold")
+                    mode_btn.config(text=tr("Hold"))
                     display_val = current_val[13:]
                 else:
                     mode_var.set("Hold")
-                    mode_btn.config(text="Hold")
+                    mode_btn.config(text=tr("Hold"))
                     display_val = current_val[7:]
 
                 if display_val == GYRO_LOCK_TOKEN:
@@ -9886,7 +9890,7 @@ bg_color=panel_bg, widths=[8, 10])
             except tk.TclError:
                 return
             mode_var.set(mode)
-            mode_btn.config(text=mode)
+            mode_btn.config(text=tr(mode))
             set_mapping_value(f"Custom[{mode}]:{token}")
             sync_joystick_direction(f"Custom[{mode}]:{token}")
             if in_app_gyro_btn:
@@ -9933,7 +9937,7 @@ bg_color=panel_bg, widths=[8, 10])
             try:
                 if not mode_btn.winfo_exists():
                     return
-                mode_btn.config(text=mode)
+                mode_btn.config(text=tr(mode))
             except tk.TclError:
                 return
             
@@ -9965,7 +9969,7 @@ bg_color=panel_bg, widths=[8, 10])
                 row_index = len(popup_rows) + len(popup_separators)
                 label_widget = tk.Label(
                     content_frame,
-                    text=label_text,
+                    text=tr(label_text),
                     bg=background_color,
                     fg=text_color,
                     font=scale_font(("Arial", 11, "bold")),
@@ -10105,15 +10109,15 @@ bg_color=panel_bg, widths=[8, 10])
                 simul_entry.delete(0, tk.END)
                 if s_val.startswith("Custom[Tap]:"):
                     if simul_mode_var: simul_mode_var.set("Tap")
-                    if simul_mode_btn: simul_mode_btn.config(text="Tap")
+                    if simul_mode_btn: simul_mode_btn.config(text=tr("Tap"))
                     display_val = s_val[12:]
                 elif s_val.startswith("Custom[Hold]:"):
                     if simul_mode_var: simul_mode_var.set("Hold")
-                    if simul_mode_btn: simul_mode_btn.config(text="Hold")
+                    if simul_mode_btn: simul_mode_btn.config(text=tr("Hold"))
                     display_val = s_val[13:]
                 else:
                     if simul_mode_var: simul_mode_var.set("Hold")
-                    if simul_mode_btn: simul_mode_btn.config(text="Hold")
+                    if simul_mode_btn: simul_mode_btn.config(text=tr("Hold"))
                     display_val = s_val[7:]
                 simul_entry.insert(0, format_input_display(display_val))
                 simul_entry.config(state="readonly")
@@ -10234,7 +10238,7 @@ bg_color=panel_bg, widths=[8, 10])
                 entry_widget.num_max = max_value
                 entry_widget.num_integer = integer
                 if suffix_text:
-                    suffix_label = tk.Label(input_group, text=suffix_text, bg=background_color, fg=text_color, font=popup_control_font)
+                    suffix_label = tk.Label(input_group, text=tr(suffix_text), bg=background_color, fg=text_color, font=popup_control_font)
                     suffix_label.pack(side=tk.RIGHT, fill=tk.Y, padx=(int(4 * scaling_factor), 0))
                     entry_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
                 else:
@@ -10338,7 +10342,7 @@ bg_color=panel_bg, widths=[8, 10])
 
             def refresh_dz_button():
                 selected = normalize_dampening_inputs(CONFIG.get_mapping_setting_scoped(dz_mode_key, [], None))
-                dz_button.config(text=dz_display_text())
+                dz_button.config(text=tr(dz_display_text()))
                 if selected:
                     for setting_row in dz_setting_rows:
                         show_popup_row(setting_row)
@@ -10410,7 +10414,7 @@ bg_color=panel_bg, widths=[8, 10])
                         cell = tk.Frame(block, bg=background_color, width=btn_w, height=btn_h)
                         cell.grid(row=r_idx, column=c_idx, padx=(0, btn_gap), pady=(0, btn_gap), sticky="nsew")
                         cell.grid_propagate(False)
-                        btn = tk.Button(cell, text=back_button_label(token), font=btn_font,
+                        btn = tk.Button(cell, text=tr(back_button_label(token)), font=btn_font,
                                         bg=button_gray, fg="white", relief=tk.FLAT, bd=0,
                                         highlightthickness=0, takefocus=0,
                                         activebackground=highlight_color, activeforeground="white",
@@ -10478,7 +10482,7 @@ bg_color=panel_bg, widths=[8, 10])
 
             def refresh_damp_button():
                 selected = normalize_dampening_inputs(CONFIG.get_mapping_setting_scoped(damp_mode_key, [], None))
-                damp_button.config(text=damp_display_text())
+                damp_button.config(text=tr(damp_display_text()))
                 if selected:
                     for setting_row in damp_setting_rows:
                         show_popup_row(setting_row)
@@ -10550,7 +10554,7 @@ bg_color=panel_bg, widths=[8, 10])
                         cell = tk.Frame(block, bg=background_color, width=btn_w, height=btn_h)
                         cell.grid(row=r_idx, column=c_idx, padx=(0, btn_gap), pady=(0, btn_gap), sticky="nsew")
                         cell.grid_propagate(False)
-                        btn = tk.Button(cell, text=back_button_label(token), font=btn_font,
+                        btn = tk.Button(cell, text=tr(back_button_label(token)), font=btn_font,
                                         bg=button_gray, fg="white", relief=tk.FLAT, bd=0,
                                         highlightthickness=0, takefocus=0,
                                         activebackground=highlight_color, activeforeground="white",
@@ -10590,7 +10594,7 @@ bg_color=panel_bg, widths=[8, 10])
                             elif final_val == "PRTSC": display_str += " + PrtSc"
                             else: display_str += f" + {format_input_display(final_val)}"
                     if in_app_gyro_btn and in_app_gyro_btn.winfo_exists():
-                        in_app_gyro_btn.config(text=display_str)
+                        in_app_gyro_btn.config(text=tr(display_str))
             
             popup.bind("<Destroy>", on_popup_destroy, add="+")
             
@@ -10652,12 +10656,12 @@ bg_color=panel_bg, widths=[8, 10])
             elif selected == IN_APP_GYRO_LABEL:
                 mode = mode_var.get() if mode_var.get() in ("Hold", "Tap") else "Hold"
                 mode_var.set(mode)
-                mode_btn.config(text=mode)
+                mode_btn.config(text=tr(mode))
                 set_mapping_value(f"Custom[{mode}]:{IN_APP_GYRO_TOKEN}")
                 sync_joystick_direction(f"Custom[{mode}]:{IN_APP_GYRO_TOKEN}")
                 self.on_setting_changed(event)
                 
-                in_app_gyro_btn.config(text=IN_APP_GYRO_LABEL)
+                in_app_gyro_btn.config(text=tr(IN_APP_GYRO_LABEL))
                 combo.pack_forget()
                 render_action_button_mapping(in_app_gyro_btn, include_close=True)
                 show_in_app_gyro_popup(event)
@@ -10694,23 +10698,23 @@ bg_color=panel_bg, widths=[8, 10])
         suffix = self._mapping_scope_suffix(mapping_scope)
         attr_key = self._mapping_attr(key, suffix)
         parent_bg = parent.cget("bg") if hasattr(parent, "cget") else background_color
-        tk.Label(parent, text=label_text, bg=parent_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(2 * scaling_factor)))
+        tk.Label(parent, text=tr(label_text), bg=parent_bg, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(2 * scaling_factor)))
         container = tk.Frame(parent, bg=parent_bg)
         container.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
 
-        combo = ttk.Combobox(container, values=JOYSTICK_OPTIONS, font=scale_font(("Arial", 11, "bold")), state="readonly", width=11, justify="center")
+        combo = LocalizedCombobox(container, values=JOYSTICK_OPTIONS, font=scale_font(("Arial", 11, "bold")), state="readonly", width=11, justify="center")
         custom_frame = tk.Frame(container, bg=parent_bg)
         scroll_activation_var = tk.StringVar(value=CONFIG.get_joystick_setting_scoped(key, "scroll_activation", "Hold", mapping_scope))
 
         def toggle_scroll_activation():
             new_mode = "Tap" if scroll_activation_var.get() == "Hold" else "Hold"
             scroll_activation_var.set(new_mode)
-            scroll_mode_btn.config(text=new_mode)
+            scroll_mode_btn.config(text=tr(new_mode))
             CONFIG.set_joystick_setting_scoped(key, "scroll_activation", new_mode, mapping_scope)
             CONFIG.save_config()
 
-        scroll_mode_btn = tk.Button(custom_frame, text=scroll_activation_var.get(), bg=button_gray, fg="white", font=scale_font(("Arial", 9, "bold")), bd=0, relief=tk.FLAT, command=toggle_scroll_activation, width=4)
-        custom_btn = tk.Button(custom_frame, text="Custom", bg=button_gray, fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT)
+        scroll_mode_btn = tk.Button(custom_frame, text=tr(scroll_activation_var.get()), bg=button_gray, fg="white", font=scale_font(("Arial", 9, "bold")), bd=0, relief=tk.FLAT, command=toggle_scroll_activation, width=4)
+        custom_btn = tk.Button(custom_frame, text=tr("Custom"), bg=button_gray, fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT)
         custom_btn.pack(side=tk.LEFT, fill=tk.Y)
 
         def open_current_popup():
@@ -10732,7 +10736,7 @@ bg_color=panel_bg, widths=[8, 10])
             CONFIG.set_mapping_setting_scoped(key, "Default", mapping_scope)
             self.on_setting_changed()
 
-        close_btn = tk.Button(custom_frame, text="X", bg="#ff4444", fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT, command=close_custom)
+        close_btn = tk.Button(custom_frame, text=tr("X"), bg="#ff4444", fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT, command=close_custom)
         close_btn.pack(side=tk.LEFT, padx=(int(2 * scaling_factor), 0), fill=tk.Y)
 
         def show_current():
@@ -10742,11 +10746,11 @@ bg_color=panel_bg, widths=[8, 10])
                 custom_frame.pack(side=tk.LEFT)
                 if current_val == "Scroll Wheel":
                     scroll_activation_var.set(CONFIG.get_joystick_setting_scoped(key, "scroll_activation", "Hold", mapping_scope))
-                    scroll_mode_btn.config(text=scroll_activation_var.get())
+                    scroll_mode_btn.config(text=tr(scroll_activation_var.get()))
                     scroll_mode_btn.pack(side=tk.LEFT, padx=(0, int(2 * scaling_factor)), fill=tk.Y, before=custom_btn)
                 else:
                     scroll_mode_btn.pack_forget()
-                custom_btn.config(text=current_val)
+                custom_btn.config(text=tr(current_val))
                 combo.set(current_val)
             else:
                 scroll_mode_btn.pack_forget()
@@ -10763,11 +10767,11 @@ bg_color=panel_bg, widths=[8, 10])
                 custom_frame.pack(side=tk.LEFT)
                 if selected == "Scroll Wheel":
                     scroll_activation_var.set(CONFIG.get_joystick_setting_scoped(key, "scroll_activation", "Hold", mapping_scope))
-                    scroll_mode_btn.config(text=scroll_activation_var.get())
+                    scroll_mode_btn.config(text=tr(scroll_activation_var.get()))
                     scroll_mode_btn.pack(side=tk.LEFT, padx=(0, int(2 * scaling_factor)), fill=tk.Y, before=custom_btn)
                 else:
                     scroll_mode_btn.pack_forget()
-                custom_btn.config(text=selected)
+                custom_btn.config(text=tr(selected))
                 self.root.update_idletasks()
                 open_current_popup()
             else:
@@ -11297,7 +11301,7 @@ bg_color=panel_bg, widths=[8, 10])
         for direction, label_text, grow, lcol in layout:
             pady = (0, row_pady) if grow == 0 else 0
             lpadx = (col_gap, cell_padx) if lcol == 2 else (0, cell_padx)
-            tk.Label(inner, text=label_text, bg=background_color, fg=text_color,
+            tk.Label(inner, text=tr(label_text), bg=background_color, fg=text_color,
                      font=scale_font(("Arial", 11, "bold")), anchor=tk.E).grid(
                          row=grow, column=lcol, sticky=tk.E, padx=lpadx, pady=pady)
             cell = tk.Frame(inner, bg=background_color)
@@ -11433,7 +11437,7 @@ bg_color=panel_bg, widths=[8, 10])
         
         row = tk.Frame(popup, bg=background_color)
         row.pack(side=tk.TOP, fill=tk.X)
-        tk.Label(row, text="Select & Change Profile:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(0, int(5 * scaling_factor)))
+        tk.Label(row, text=tr("Select & Change Profile:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(0, int(5 * scaling_factor)))
 
         def set_change_profile_mode(val):
             CONFIG.change_profile_mode = val
@@ -11581,7 +11585,7 @@ bg_color=panel_bg, widths=[8, 10])
         def render_category(parent, title):
             cat_frame = tk.Frame(parent, bg=background_color)
             cat_frame.pack(side=tk.LEFT, anchor=tk.N)
-            tk.Label(cat_frame, text=title, bg=background_color, fg=text_color,
+            tk.Label(cat_frame, text=tr(title), bg=background_color, fg=text_color,
                      font=header_font, anchor=tk.W).pack(side=tk.TOP, anchor=tk.W, pady=(0, btn_gap))
             block = tk.Frame(cat_frame, bg=background_color)
             block.pack(side=tk.TOP, anchor=tk.W)
@@ -11593,7 +11597,7 @@ bg_color=panel_bg, widths=[8, 10])
                     cell.grid(row=r_idx, column=c_idx, padx=(0, btn_gap), pady=(0, btn_gap), sticky="nsew")
                     cell.grid_propagate(False)
                     bd = int(2 * scaling_factor) if is_sel else 0
-                    btn = tk.Button(cell, text=display_label(token), font=btn_font,
+                    btn = tk.Button(cell, text=tr(display_label(token)), font=btn_font,
                                     bg=button_gray, fg="white", relief=tk.FLAT, bd=0,
                                     highlightthickness=0, takefocus=0,
                                     activebackground=highlight_color, activeforeground="white",
@@ -11625,7 +11629,7 @@ bg_color=panel_bg, widths=[8, 10])
         popup = self._create_joystick_option_popup(anchor_widget)
         row = tk.Frame(popup, bg=background_color)
         row.pack(side=tk.TOP, fill=tk.X)
-        tk.Label(row, text="Sensitivity:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(0, int(5 * scaling_factor)))
+        tk.Label(row, text=tr("Sensitivity:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(0, int(5 * scaling_factor)))
         def update_mouse_sensitivity(val):
             CONFIG.set_joystick_setting_scoped(key, "mouse_sensitivity", float(val), mapping_scope)
             if mapping_scope == "in_app_gyro_mode_mappings" and hasattr(self, "stick_scale"):
@@ -11661,7 +11665,7 @@ bg_color=panel_bg, widths=[8, 10])
         popup = self._create_joystick_option_popup(anchor_widget)
         row = tk.Frame(popup, bg=background_color)
         row.pack(side=tk.TOP, fill=tk.X)
-        tk.Label(row, text="Scroll Wheel Mode:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(0, int(5 * scaling_factor)))
+        tk.Label(row, text=tr("Scroll Wheel Mode:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(0, int(5 * scaling_factor)))
 
         mode = CONFIG.get_joystick_setting_scoped(key, "scroll_mode", "Up/Down", mapping_scope)
         switch = ToggleSwitch(
@@ -11691,7 +11695,7 @@ bg_color=panel_bg, widths=[8, 10])
 
     def _set_profile_button_text(self):
         if hasattr(self, "profile_button"):
-            self.profile_button.config(text=getattr(CONFIG, "active_profile", "Default"))
+            self.profile_button.config(text=tr(getattr(CONFIG, "active_profile", "Default")))
 
     def on_popup_profile_selected(self, profile_name, name_frame, name_btn, frame_w, frame_h):
         # Selecting a profile in the popup: 1) move the highlight border onto the new
@@ -11774,7 +11778,7 @@ bg_color=panel_bg, widths=[8, 10])
 
     def _record_profile_combo_input(self, button, clear_button, save_callback, unique_profile=None):
         import utils
-        button.config(text="Recording...")
+        button.config(text=tr("Recording..."))
         button.focus_set()
         if clear_button:
             if not clear_button.winfo_ismapped():
@@ -11814,7 +11818,7 @@ bg_color=panel_bg, widths=[8, 10])
                 return
             cleanup_recording_binds()
             save_callback("")
-            button.config(text="None")
+            button.config(text=tr("None"))
             restore_clear_button(False)
             CONFIG.save_config()
             self.root.after(100, self.bind_profile_popup_outside_click)
@@ -11844,7 +11848,7 @@ bg_color=panel_bg, widths=[8, 10])
                         self.root.after(100, lambda: self._record_profile_combo_input(button, clear_button, save_callback, unique_profile))
                         return
             save_callback(value)
-            button.config(text=self._format_profile_combo_input(value))
+            button.config(text=tr(self._format_profile_combo_input(value)))
             if clear_button:
                 if value:
                     restore_clear_button(True)
@@ -11855,7 +11859,7 @@ bg_color=panel_bg, widths=[8, 10])
             cleanup_recording_binds()
             if not recorded_seq:
                 save_callback("")
-                button.config(text="None")
+                button.config(text=tr("None"))
                 restore_clear_button(False)
             else:
                 set_recorded_value(recorded_seq)
@@ -11993,7 +11997,7 @@ bg_color=panel_bg, widths=[8, 10])
         frame = tk.Frame(parent, bg=background_color)
         btn = tk.Button(
             frame,
-            text=self._format_profile_combo_input(value_getter()),
+            text=tr(self._format_profile_combo_input(value_getter())),
             font=scale_font(("Arial", 10, "bold")),
             bg=button_gray,
             fg="white",
@@ -12006,14 +12010,14 @@ bg_color=panel_bg, widths=[8, 10])
 
         def save_value(value):
             value_setter(value)
-            btn.config(text=self._format_profile_combo_input(value))
+            btn.config(text=tr(self._format_profile_combo_input(value)))
 
         def clear_value():
             save_value("")
             clear_btn.pack_forget()
             CONFIG.save_config()
 
-        clear_btn = tk.Button(frame, text="X", bg="#ff4444", fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT, command=clear_value)
+        clear_btn = tk.Button(frame, text=tr("X"), bg="#ff4444", fg="white", font=scale_font(("Arial", 10, "bold")), bd=0, relief=tk.FLAT, command=clear_value)
         clear_btn.profile_combo_clear_command = clear_value
         if value_getter():
             clear_btn.pack(side=tk.LEFT, padx=(int(2 * scaling_factor), 0), fill=tk.Y)
@@ -12070,13 +12074,13 @@ bg_color=panel_bg, widths=[8, 10])
         name_hdr.grid(row=0, column=0, sticky=tk.W, padx=(0, column_gap))
         name_hdr.grid_propagate(False)
         name_hdr.pack_propagate(False)
-        tk.Label(name_hdr, text="Profile Name", bg=background_color, fg=text_color, font=profile_popup_header_font, anchor=tk.W).pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        tk.Label(name_hdr, text=tr("Profile Name"), bg=background_color, fg=text_color, font=profile_popup_header_font, anchor=tk.W).pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         combo_hdr = tk.Frame(header, bg=background_color, width=combo_col_width, height=header_row_height)
         combo_hdr.grid(row=0, column=1, sticky=tk.W, padx=(0, column_gap))
         combo_hdr.grid_propagate(False)
         combo_hdr.pack_propagate(False)
-        tk.Label(combo_hdr, text="Profile Switching Combo", bg=background_color, fg=text_color, font=profile_popup_header_font, anchor=tk.W).pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        tk.Label(header, text="Change Profile List", bg=background_color, fg=text_color, font=profile_popup_header_font, anchor=tk.W).grid(row=0, column=2, sticky=tk.W)
+        tk.Label(combo_hdr, text=tr("Profile Switching Combo"), bg=background_color, fg=text_color, font=profile_popup_header_font, anchor=tk.W).pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        tk.Label(header, text=tr("Change Profile List"), bg=background_color, fg=text_color, font=profile_popup_header_font, anchor=tk.W).grid(row=0, column=2, sticky=tk.W)
 
         # Match the row spacing to the L/R Joystick Custom popup (10px gap between rows).
         row_pady = int(5 * scaling_factor)
@@ -12138,7 +12142,7 @@ bg_color=panel_bg, widths=[8, 10])
                 name_frame = tk.Frame(row, bg=highlight_color if is_active_profile else background_color, width=profile_col_width, height=row_height)
                 name_frame.grid(row=0, column=0, sticky=tk.EW, padx=(0, column_gap))
                 name_frame.grid_propagate(False)
-                name_btn = tk.Button(name_frame, text=profile_name, font=scale_font(("Arial", 10, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, anchor=tk.W)
+                name_btn = tk.Button(name_frame, text=tr(profile_name), font=scale_font(("Arial", 10, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, anchor=tk.W)
                 active_border = 2 if is_active_profile else 0
                 name_btn.place(
                     x=active_border,
@@ -12170,7 +12174,7 @@ bg_color=panel_bg, widths=[8, 10])
                 check_cell = tk.Frame(row, bg=background_color, width=row_height, height=row_height)
                 check_cell.grid(row=0, column=2, sticky=tk.W)
                 check_cell.grid_propagate(False)
-                chk_btn = tk.Button(check_cell, text="V" if checked else "", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=lambda p=profile_name, cur=checked: self.on_profile_change_list_toggled(p, not cur, refresh_popup_rows))
+                chk_btn = tk.Button(check_cell, text=tr("V" if checked else ""), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=lambda p=profile_name, cur=checked: self.on_profile_change_list_toggled(p, not cur, refresh_popup_rows))
                 chk_btn.place(x=0, y=0, width=row_height, height=row_height)
                 bind_profile_mousewheel(row)
             update_scroll()
@@ -12202,7 +12206,7 @@ bg_color=panel_bg, widths=[8, 10])
         the scrolling area.
         """
         dialog = tk.Toplevel(self.root)
-        dialog.title(title)
+        dialog.title(tr(title))
         dialog.configure(bg=background_color)
         dialog.transient(self.root)
         dialog.resizable(False, False)
@@ -12230,7 +12234,7 @@ bg_color=panel_bg, widths=[8, 10])
         include_calibration = [True]
 
         tk.Label(
-            dialog, text=title, bg=background_color, fg=text_color,
+            dialog, text=tr(title), bg=background_color, fg=text_color,
             font=scale_font(("Arial", 11, "bold")), anchor=tk.CENTER
         ).pack(side=tk.TOP, fill=tk.X, pady=(spacing, spacing))
 
@@ -12295,7 +12299,7 @@ bg_color=panel_bg, widths=[8, 10])
 
         def make_check_button(parent, is_checked, command):
             btn = tk.Button(
-                parent, text="V" if is_checked else "",
+                parent, text=tr("V" if is_checked else ""),
                 font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white",
                 relief=tk.FLAT, bd=0, command=command
             )
@@ -12317,7 +12321,7 @@ bg_color=panel_bg, widths=[8, 10])
             label_cell.grid(row=0, column=0, sticky=tk.EW, padx=(0, column_gap))
             label_cell.grid_propagate(False)
             tk.Label(
-                label_cell, text=label_text, bg=background_color, fg=text_color,
+                label_cell, text=tr(label_text), bg=background_color, fg=text_color,
                 font=scale_font(("Arial", 10, "bold")), anchor=tk.E
             ).place(x=0, y=0, width=profile_col_width, height=row_height)
 
@@ -12329,11 +12333,11 @@ bg_color=panel_bg, widths=[8, 10])
             return btn
 
         def sync_select_all_button():
-            select_all_btn.config(text="V" if select_all_checked[0] else "")
+            select_all_btn.config(text=tr("V" if select_all_checked[0] else ""))
 
         def on_profile_toggled(name):
             checked[name] = not checked[name]
-            check_buttons[name].config(text="V" if checked[name] else "")
+            check_buttons[name].config(text=tr("V" if checked[name] else ""))
             # Only reflect the aggregate state here - toggling a single profile must
             # never cascade back onto the other rows.
             select_all_checked[0] = bool(names) and all(checked[n] for n in names)
@@ -12345,7 +12349,7 @@ bg_color=panel_bg, widths=[8, 10])
             select_all_checked[0] = not select_all_checked[0]
             for name in names:
                 checked[name] = select_all_checked[0]
-                check_buttons[name].config(text="V" if checked[name] else "")
+                check_buttons[name].config(text=tr("V" if checked[name] else ""))
             sync_select_all_button()
 
         for name in names:
@@ -12365,7 +12369,7 @@ bg_color=panel_bg, widths=[8, 10])
             name_cell.grid(row=0, column=0, sticky=tk.EW, padx=(0, column_gap))
             name_cell.grid_propagate(False)
             name_lbl = tk.Label(
-                name_cell, text=name, font=scale_font(("Arial", 10, "bold")),
+                name_cell, text=tr(name), font=scale_font(("Arial", 10, "bold")),
                 bg=button_gray, fg="white", anchor=tk.CENTER, padx=int(5 * scaling_factor)
             )
             name_lbl.place(x=0, y=0, width=profile_col_width, height=row_height)
@@ -12384,14 +12388,14 @@ bg_color=panel_bg, widths=[8, 10])
         if keep_frame is not None:
             def on_keep_toggled():
                 keep_current[0] = not keep_current[0]
-                keep_btn.config(text="V" if keep_current[0] else "")
+                keep_btn.config(text=tr("V" if keep_current[0] else ""))
 
             keep_btn = make_footer_check_row(keep_frame, "Keep Current Profiles", on_keep_toggled)
 
         if calibration_frame is not None:
             def on_calibration_toggled():
                 include_calibration[0] = not include_calibration[0]
-                calibration_btn.config(text="V" if include_calibration[0] else "")
+                calibration_btn.config(text=tr("V" if include_calibration[0] else ""))
 
             calibration_btn = make_footer_check_row(
                 calibration_frame, f"{action_text} Controller Related Data", on_calibration_toggled
@@ -12419,7 +12423,7 @@ bg_color=panel_bg, widths=[8, 10])
                 if not proceed:
                     # Cancel returns to this window with the option turned off.
                     include_calibration[0] = False
-                    calibration_btn.config(text="")
+                    calibration_btn.config(text=tr(""))
                     return
             result["selected"] = selected
             result["keep"] = keep_current[0] if show_keep_current else None
@@ -12430,11 +12434,11 @@ bg_color=panel_bg, widths=[8, 10])
             dialog.destroy()
 
         tk.Button(
-            btn_frame, text=action_text, font=scale_font(("Arial", 11, "bold")),
+            btn_frame, text=tr(action_text), font=scale_font(("Arial", 11, "bold")),
             bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=on_action
         ).pack(side=tk.LEFT, padx=row_pady)
         tk.Button(
-            btn_frame, text="Cancel", font=scale_font(("Arial", 11, "bold")),
+            btn_frame, text=tr("Cancel"), font=scale_font(("Arial", 11, "bold")),
             bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=on_cancel
         ).pack(side=tk.LEFT, padx=row_pady)
 
@@ -12473,11 +12477,11 @@ bg_color=panel_bg, widths=[8, 10])
             return inner
 
         row_profile = left_row(pady=(int(18 * scaling_factor), int(5 * scaling_factor)))
-        tk.Label(row_profile, text="Profile:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(row_profile, text=tr("Profile:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
         
         self.profile_button = tk.Button(
             row_profile,
-            text=CONFIG.active_profile,
+            text=tr(CONFIG.active_profile),
             font=scale_font(("Arial", 11, "bold")),
             bg=button_gray,
             fg="white",
@@ -12490,22 +12494,22 @@ bg_color=panel_bg, widths=[8, 10])
         # Hovering shows the full active-profile name when the fixed-width button clips it.
         Tooltip(self.profile_button, lambda b=self.profile_button: b.cget("text"))
 
-        self.add_profile_btn = tk.Button(row_profile, text="Add", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_add_profile)
+        self.add_profile_btn = tk.Button(row_profile, text=tr("Add"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_add_profile)
         self.add_profile_btn.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
 
-        self.rename_profile_btn = tk.Button(row_profile, text="Rename", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_rename_profile)
+        self.rename_profile_btn = tk.Button(row_profile, text=tr("Rename"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_rename_profile)
         self.rename_profile_btn.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
         
-        self.import_profile_btn = tk.Button(row_profile, text="Import", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_import_profiles)
+        self.import_profile_btn = tk.Button(row_profile, text=tr("Import"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_import_profiles)
         self.import_profile_btn.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
 
-        self.export_profile_btn = tk.Button(row_profile, text="Export", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_export_profiles)
+        self.export_profile_btn = tk.Button(row_profile, text=tr("Export"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_export_profiles)
         self.export_profile_btn.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
 
-        self.reset_profile_btn = tk.Button(row_profile, text="Reset", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_reset_profile)
+        self.reset_profile_btn = tk.Button(row_profile, text=tr("Reset"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_reset_profile)
         self.reset_profile_btn.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
 
-        self.del_profile_btn = tk.Button(row_profile, text="Delete", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_delete_profile)
+        self.del_profile_btn = tk.Button(row_profile, text=tr("Delete"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_delete_profile)
         self.del_profile_btn.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
         self.assigned_apps_frame = tk.Frame(row_profile, bg=background_color)
         self.assigned_apps_frame.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
@@ -12517,7 +12521,7 @@ bg_color=panel_bg, widths=[8, 10])
         row_global = left_row(pady=(int(18 * scaling_factor), int(5 * scaling_factor)))
         
         # Driver Switch
-        tk.Label(row_global, text="Driver:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(2 * scaling_factor)))
+        tk.Label(row_global, text=tr("Driver:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(2 * scaling_factor)))
         # MSIX can expose WinUHid only when a healthy copy was installed
         # separately.  It never bundles or installs the driver itself.
         _winuhid_available = packaged_winuhid_available()
@@ -12537,7 +12541,7 @@ bg_color=panel_bg, widths=[8, 10])
         self.driver_switch.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
         
         # Emu Mode
-        tk.Label(row_global, text="Emu Mode:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(20 * scaling_factor), int(2 * scaling_factor)))
+        tk.Label(row_global, text=tr("Emu Mode:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(20 * scaling_factor), int(2 * scaling_factor)))
         
         initial_driver = getattr(CONFIG, "driver_type", "WinUHid")
         if initial_driver == "ViGEmBus":
@@ -12551,30 +12555,30 @@ bg_color=panel_bg, widths=[8, 10])
         self.sim_mode_switch.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
         
         # Layout
-        tk.Label(row_global, text="Layout:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(20 * scaling_factor), int(2 * scaling_factor)))
+        tk.Label(row_global, text=tr("Layout:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(20 * scaling_factor), int(2 * scaling_factor)))
         self.layout_switch = ToggleSwitch(row_global, ["Xbox", "Switch"], ["Xbox", "Switch"], CONFIG.abxy_mode, self.update_layout_setting, background_color)
         self.layout_switch.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
 
         row_vibration = left_row()
-        tk.Label(row_vibration, text="Rumble Mode:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(2 * scaling_factor)))
+        tk.Label(row_vibration, text=tr("Rumble Mode:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(2 * scaling_factor)))
         self.rumble_mode_switch = ToggleSwitch(row_vibration, ["Xbox", "Switch"], ["Xbox", "Switch"], getattr(CONFIG, "rumble_mode", "Xbox"), self.update_rumble_mode_setting, background_color)
         self.rumble_mode_switch.pack(side=tk.LEFT, padx=int(5 * scaling_factor))
-        self.audio_haptics_button = tk.Button(row_vibration, text="Audio Haptics Settings", command=lambda: self.open_audio_haptics_settings(self.audio_haptics_button), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color, relief=tk.FLAT, bd=0, activebackground=highlight_color, padx=int(10 * scaling_factor))
+        self.audio_haptics_button = tk.Button(row_vibration, text=tr("Audio Haptics Settings"), command=lambda: self.open_audio_haptics_settings(self.audio_haptics_button), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color, relief=tk.FLAT, bd=0, activebackground=highlight_color, padx=int(10 * scaling_factor))
         self.audio_haptics_button.pack(side=tk.LEFT, padx=(int(10 * scaling_factor), 0))
-        self.impulse_trigger_button = tk.Button(row_vibration, text="Impulse Trigger Settings", command=lambda: self.open_impulse_trigger_settings(self.impulse_trigger_button), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color, relief=tk.FLAT, bd=0, activebackground=highlight_color, padx=int(10 * scaling_factor))
+        self.impulse_trigger_button = tk.Button(row_vibration, text=tr("Impulse Trigger Settings"), command=lambda: self.open_impulse_trigger_settings(self.impulse_trigger_button), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color, relief=tk.FLAT, bd=0, activebackground=highlight_color, padx=int(10 * scaling_factor))
         self.update_dynamic_rumble_mode_options()
 
-        self.strength_label = tk.Label(row_vibration, text="Strength:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")))
+        self.strength_label = tk.Label(row_vibration, text=tr("Strength:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")))
         self.strength_label.pack(side=tk.LEFT, padx=(int(20 * scaling_factor), int(2 * scaling_factor)))
         self.vibration_strength_scale = tk.Scale(row_vibration, from_=0, to=10, resolution=1, orient=tk.HORIZONTAL, length=int(120 * scaling_factor), bg=background_color, fg=text_color, troughcolor=button_gray, activebackground=highlight_color, highlightthickness=0, bd=0, sliderrelief=tk.FLAT, sliderlength=int(15 * scaling_factor), width=int(15 * scaling_factor), font=scale_font(("Arial", 11, "bold")), command=self.update_vibration_strength)
         self.vibration_strength_scale.set(getattr(CONFIG, "vibration_strength", 5))
         self.vibration_strength_scale.pack(side=tk.LEFT)
 
-        self.vibration_frequency_label = tk.Label(row_vibration, text="Frequency:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")))
+        self.vibration_frequency_label = tk.Label(row_vibration, text=tr("Frequency:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")))
         self.vibration_frequency_scale = tk.Scale(row_vibration, from_=1, to=10, resolution=1, orient=tk.HORIZONTAL, length=int(120 * scaling_factor), bg=background_color, fg=text_color, troughcolor=button_gray, activebackground=highlight_color, highlightthickness=0, bd=0, sliderrelief=tk.FLAT, sliderlength=int(15 * scaling_factor), width=int(15 * scaling_factor), font=scale_font(("Arial", 11, "bold")), command=self.update_vibration_frequency)
         self.vibration_frequency_scale.set(getattr(CONFIG, "vibration_frequency", 10))
 
-        self.delay_label = tk.Label(row_vibration, text="Delay:", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")))
+        self.delay_label = tk.Label(row_vibration, text=tr("Delay:"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")))
         self.delay_label.pack(side=tk.LEFT, padx=(int(20 * scaling_factor), int(2 * scaling_factor)))
         
         def validate_numeric(char):
@@ -12584,7 +12588,7 @@ bg_color=panel_bg, widths=[8, 10])
         self.rumble_delay_entry = tk.Entry(row_vibration, width=4, bg=button_gray, fg=text_color, insertbackground=text_color, bd=0, relief=tk.FLAT, font=scale_font(("Arial", 11, "bold")), justify=tk.CENTER, validate="key", validatecommand=vcmd)
         self.rumble_delay_entry.insert(0, str(getattr(CONFIG, "rumble_delay_ms", 0)))
         self.rumble_delay_entry.pack(side=tk.LEFT, padx=int(2 * scaling_factor))
-        self.delay_ms_label = tk.Label(row_vibration, text="ms", bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")))
+        self.delay_ms_label = tk.Label(row_vibration, text=tr("ms"), bg=background_color, fg=text_color, font=scale_font(("Arial", 11, "bold")))
         self.delay_ms_label.pack(side=tk.LEFT, padx=(0, int(10 * scaling_factor)))
         
         self.rumble_delay_entry.bind("<KeyRelease>", self.on_rumble_delay_changed)
@@ -12602,7 +12606,7 @@ bg_color=panel_bg, widths=[8, 10])
             frame.pack(side=tk.LEFT, padx=(0 if idx == 0 else int(2 * scaling_factor), int(2 * scaling_factor)))
             btn = tk.Button(
                 frame,
-                text=label,
+                text=tr(label),
                 width=max(8, len(label) + 1),
                 font=scale_font(("Arial", 11, "bold")),
                 bg=button_gray,
@@ -12620,7 +12624,7 @@ bg_color=panel_bg, widths=[8, 10])
         self.controller_mapping_frame = tk.Frame(self.tab_content_frame, bg=tab_black)
         self.in_app_gyro_mode_mapping_frame = tk.Frame(self.tab_content_frame, bg=tab_black)
 
-        shared_frame = tk.LabelFrame(self.controller_mapping_frame, text=" Shared Buttons & Joysticks ", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold")), bd=1, relief=tk.GROOVE, padx=int(5 * scaling_factor), pady=int(5 * scaling_factor))
+        shared_frame = tk.LabelFrame(self.controller_mapping_frame, text=tr(" Shared Buttons & Joysticks "), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold")), bd=1, relief=tk.GROOVE, padx=int(5 * scaling_factor), pady=int(5 * scaling_factor))
         shared_frame.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor), padx=(int(5 * scaling_factor), 0))
 
         def shared_mapping_row():
@@ -12642,7 +12646,7 @@ bg_color=panel_bg, widths=[8, 10])
         self.create_joystick_mapping_widget(row_shared_3, "r_joystick", "R Joystick:")
         self.create_mapping_widget(row_shared_3, "r_stk", "R Joystick Click:")
         self.joystick_deadzone_button = tk.Button(
-            row_shared_3, text="Joystick Deadzone Settings",
+            row_shared_3, text=tr("Joystick Deadzone Settings"),
             command=lambda: self.open_joystick_deadzone_settings(self.joystick_deadzone_button),
             font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color,
             relief=tk.FLAT, bd=0, activebackground=highlight_color,
@@ -12658,17 +12662,17 @@ bg_color=panel_bg, widths=[8, 10])
             self.create_mapping_widget(row_shared_5, key, label)
 
         row_pro = tk.Frame(self.controller_mapping_frame, bg=tab_black); row_pro.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Label(row_pro, text="Pro Controller Back Buttons:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(row_pro, text=tr("Pro Controller Back Buttons:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
         for key, label in [("gl", "GL:"), ("gr", "GR:")]:
             self.create_mapping_widget(row_pro, key, label)
 
         row_jc = tk.Frame(self.controller_mapping_frame, bg=tab_black); row_jc.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Label(row_jc, text="Joy-con Rail Buttons:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(row_jc, text=tr("Joy-con Rail Buttons:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
         for key, label in [("sll", "Left SL:"), ("srl", "Left SR:"), ("slr", "Right SL:"), ("srr", "Right SR:")]:
             self.create_mapping_widget(row_jc, key, label)
 
         row_ir = tk.Frame(self.controller_mapping_frame, bg=tab_black); row_ir.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Label(row_ir, text="Joy-con IR Sensor:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(row_ir, text=tr("Joy-con IR Sensor:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
         self.joycon_ir_left_button = tk.Button(row_ir, font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color, relief=tk.FLAT, bd=0, command=lambda: self.open_joycon_ir_sensor_settings("left", self.joycon_ir_left_button))
         self.joycon_ir_left_button.pack(side=tk.LEFT, padx=int(3 * scaling_factor))
         self.joycon_ir_right_button = tk.Button(row_ir, font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color, relief=tk.FLAT, bd=0, command=lambda: self.open_joycon_ir_sensor_settings("right", self.joycon_ir_right_button))
@@ -12676,17 +12680,17 @@ bg_color=panel_bg, widths=[8, 10])
         self.refresh_joycon_ir_sensor_buttons()
 
         row_gc = tk.Frame(self.controller_mapping_frame, bg=tab_black); row_gc.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Label(row_gc, text="GameCube Controller:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(row_gc, text=tr("GameCube Controller:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
         
-        self.gc_trigger_calib_btn = tk.Button(row_gc, text="Trigger Calibration", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_gc_trigger_calib_clicked)
+        self.gc_trigger_calib_btn = tk.Button(row_gc, text=tr("Trigger Calibration"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_gc_trigger_calib_clicked)
         self.gc_trigger_calib_btn.pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(10 * scaling_factor)))
 
-        tk.Label(row_gc, text="Analog Trigger 100%:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(2 * scaling_factor)))
+        tk.Label(row_gc, text=tr("Analog Trigger 100%:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(2 * scaling_factor)))
         
         self.gc_trigger_labels = ["Hair Trigger", "Before Click", "Fully Clicked"]
         self.gc_trigger_values = ["Hair Trigger", "100% at Bump", "100% at Max"]
         
-        self.gc_trigger_combo = ttk.Combobox(row_gc, values=self.gc_trigger_labels, font=scale_font(("Arial", 11, "bold")), state="readonly", width=12, justify="center")
+        self.gc_trigger_combo = LocalizedCombobox(row_gc, values=self.gc_trigger_labels, font=scale_font(("Arial", 11, "bold")), state="readonly", width=12, justify="center")
         
         current_val = getattr(CONFIG, "gc_trigger_mode", "100% at Bump")
         try:
@@ -12721,10 +12725,10 @@ bg_color=panel_bg, widths=[8, 10])
         gyro_mapping_scope = "in_app_gyro_mode_mappings"
         gyro_actions_row = tk.Frame(self.in_app_gyro_mode_mapping_frame, bg=tab_black)
         gyro_actions_row.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Button(gyro_actions_row, text="Copy From Controller Mapping", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_use_default_controller_mapping_for_gyro_mode).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(2 * scaling_factor)))
-        tk.Button(gyro_actions_row, text="Reset", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_reset_in_app_gyro_mode_mapping).pack(side=tk.LEFT, padx=int(2 * scaling_factor))
+        tk.Button(gyro_actions_row, text=tr("Copy From Controller Mapping"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_use_default_controller_mapping_for_gyro_mode).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(2 * scaling_factor)))
+        tk.Button(gyro_actions_row, text=tr("Reset"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=self.on_reset_in_app_gyro_mode_mapping).pack(side=tk.LEFT, padx=int(2 * scaling_factor))
 
-        gyro_shared_frame = tk.LabelFrame(self.in_app_gyro_mode_mapping_frame, text=" Shared Buttons & Joysticks ", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold")), bd=1, relief=tk.GROOVE, padx=int(5 * scaling_factor), pady=int(5 * scaling_factor))
+        gyro_shared_frame = tk.LabelFrame(self.in_app_gyro_mode_mapping_frame, text=tr(" Shared Buttons & Joysticks "), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold")), bd=1, relief=tk.GROOVE, padx=int(5 * scaling_factor), pady=int(5 * scaling_factor))
         gyro_shared_frame.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor), padx=(int(5 * scaling_factor), 0))
 
         def gyro_shared_mapping_row():
@@ -12755,17 +12759,17 @@ bg_color=panel_bg, widths=[8, 10])
             self.create_mapping_widget(gyro_row_shared_5, key, label, gyro_mapping_scope)
 
         gyro_row_pro = tk.Frame(self.in_app_gyro_mode_mapping_frame, bg=tab_black); gyro_row_pro.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Label(gyro_row_pro, text="Pro Controller Back Buttons:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(gyro_row_pro, text=tr("Pro Controller Back Buttons:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
         for key, label in [("gl", "GL:"), ("gr", "GR:")]:
             self.create_mapping_widget(gyro_row_pro, key, label, gyro_mapping_scope)
 
         gyro_row_jc = tk.Frame(self.in_app_gyro_mode_mapping_frame, bg=tab_black); gyro_row_jc.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Label(gyro_row_jc, text="Joy-con Rail Buttons:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(gyro_row_jc, text=tr("Joy-con Rail Buttons:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
         for key, label in [("sll", "Left SL:"), ("srl", "Left SR:"), ("slr", "Right SL:"), ("srr", "Right SR:")]:
             self.create_mapping_widget(gyro_row_jc, key, label, gyro_mapping_scope)
 
         gyro_row_ir = tk.Frame(self.in_app_gyro_mode_mapping_frame, bg=tab_black); gyro_row_ir.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Label(gyro_row_ir, text="Joy-con IR Sensor:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(gyro_row_ir, text=tr("Joy-con IR Sensor:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
         self.gyro_joycon_ir_left_button = tk.Button(gyro_row_ir, font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color, relief=tk.FLAT, bd=0, command=lambda: self.open_joycon_ir_sensor_settings("left", self.gyro_joycon_ir_left_button, gyro_mapping_scope))
         self.gyro_joycon_ir_left_button.pack(side=tk.LEFT, padx=int(3 * scaling_factor))
         self.gyro_joycon_ir_right_button = tk.Button(gyro_row_ir, font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg=text_color, relief=tk.FLAT, bd=0, command=lambda: self.open_joycon_ir_sensor_settings("right", self.gyro_joycon_ir_right_button, gyro_mapping_scope))
@@ -12773,10 +12777,10 @@ bg_color=panel_bg, widths=[8, 10])
         self.refresh_joycon_ir_sensor_buttons()
 
         gyro_row_gc = tk.Frame(self.in_app_gyro_mode_mapping_frame, bg=tab_black); gyro_row_gc.pack(side=tk.TOP, fill=tk.X, pady=int(5 * scaling_factor))
-        tk.Label(gyro_row_gc, text="GameCube Controller:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
+        tk.Label(gyro_row_gc, text=tr("GameCube Controller:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(10 * scaling_factor), int(5 * scaling_factor)))
 
-        tk.Label(gyro_row_gc, text="Analog Trigger 100%:", bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(2 * scaling_factor)))
-        self.gyro_gc_trigger_combo = ttk.Combobox(gyro_row_gc, values=self.gc_trigger_labels, font=scale_font(("Arial", 11, "bold")), state="readonly", width=12, justify="center")
+        tk.Label(gyro_row_gc, text=tr("Analog Trigger 100%:"), bg=tab_black, fg=text_color, font=scale_font(("Arial", 11, "bold"))).pack(side=tk.LEFT, padx=(int(5 * scaling_factor), int(2 * scaling_factor)))
+        self.gyro_gc_trigger_combo = LocalizedCombobox(gyro_row_gc, values=self.gc_trigger_labels, font=scale_font(("Arial", 11, "bold")), state="readonly", width=12, justify="center")
         gyro_current_val = CONFIG.get_scoped_category_setting("gc_trigger_mode", "Hair Trigger", gyro_mapping_scope)
         try:
             idx = self.gc_trigger_values.index(gyro_current_val)
@@ -12886,11 +12890,11 @@ bg_color=panel_bg, widths=[8, 10])
         # Use a shared, natural-width grid column instead of Label.width.
         # Label.width is character-cell based and created asymmetric visual
         # padding with proportional bold fonts.
-        audio_label = tk.Label(content_frame, text="Audio Haptics:", font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
+        audio_label = tk.Label(content_frame, text=tr("Audio Haptics:"), font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
         audio_label.grid(row=0, column=0, sticky=tk.E, padx=(0, int(5 * scaling_factor)), pady=(0, int(15 * scaling_factor)))
         ToggleSwitch(content_frame, ["On", "Off"], [True, False], getattr(CONFIG, "audio_haptics_enabled", True), update_audio_haptics, background_color).grid(row=0, column=1, sticky=tk.W, pady=(0, int(15 * scaling_factor)))
 
-        adaptive_label = tk.Label(content_frame, text="Adaptive Triggers:", font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
+        adaptive_label = tk.Label(content_frame, text=tr("Adaptive Triggers:"), font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
         adaptive_label.grid(row=1, column=0, sticky=tk.E, padx=(0, int(5 * scaling_factor)))
         ToggleSwitch(content_frame, ["On", "Off"], [True, False], getattr(CONFIG, "adaptive_triggers_enabled", True), update_adaptive_triggers, background_color).grid(row=1, column=1, sticky=tk.W)
 
@@ -12947,21 +12951,21 @@ bg_color=panel_bg, widths=[8, 10])
         # A shared two-column grid gives a natural-width title column: its
         # longest label starts at the real popup padding, while all titles
         # still share a right edge and all controls share a left edge.
-        impulse_label = tk.Label(content_frame, text="Impulse Trigger:", font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
+        impulse_label = tk.Label(content_frame, text=tr("Impulse Trigger:"), font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
         impulse_label.grid(row=0, column=0, sticky=tk.E, padx=(0, int(5 * scaling_factor)), pady=(0, int(15 * scaling_factor)))
         ToggleSwitch(content_frame, ["On", "Off"], [True, False], getattr(CONFIG, 'impulse_trigger_enabled', True), update_impulse_enabled, background_color).grid(row=0, column=1, sticky=tk.W, pady=(0, int(15 * scaling_factor)))
 
-        dynamic_label = tk.Label(content_frame, text="Dynamic Frequency:", font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
+        dynamic_label = tk.Label(content_frame, text=tr("Dynamic Frequency:"), font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
         dynamic_label.grid(row=1, column=0, sticky=tk.E, padx=(0, int(5 * scaling_factor)))
         ToggleSwitch(content_frame, ["On", "Off"], [True, False], getattr(CONFIG, 'impulse_trigger_dynamic_frequency', True), update_dynamic_frequency, background_color).grid(row=1, column=1, sticky=tk.W)
 
-        strength_label = tk.Label(content_frame, text="Strength:", font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
+        strength_label = tk.Label(content_frame, text=tr("Strength:"), font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
         strength_label.grid(row=2, column=0, sticky=tk.E, padx=(0, int(5 * scaling_factor)), pady=(int(15 * scaling_factor), 0))
         strength_scale = tk.Scale(content_frame, from_=1, to=10, resolution=1, orient=tk.HORIZONTAL, length=int(120 * scaling_factor), bg=background_color, fg=text_color, troughcolor=button_gray, activebackground=highlight_color, highlightthickness=0, bd=0, sliderrelief=tk.FLAT, sliderlength=int(15 * scaling_factor), width=int(15 * scaling_factor), font=scale_font(("Arial", 11, "bold")), command=update_impulse_strength)
         strength_scale.set(getattr(CONFIG, 'impulse_trigger_strength', 5))
         strength_scale.grid(row=2, column=1, sticky=tk.W, pady=(int(15 * scaling_factor), 0))
 
-        frequency_label = tk.Label(content_frame, text="Frequency:", font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
+        frequency_label = tk.Label(content_frame, text=tr("Frequency:"), font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, anchor="e")
         frequency_label.grid(row=3, column=0, sticky=tk.E, padx=(0, int(5 * scaling_factor)), pady=(int(15 * scaling_factor), 0))
         frequency_scale = tk.Scale(content_frame, from_=1, to=10, resolution=1, orient=tk.HORIZONTAL, length=int(120 * scaling_factor), bg=background_color, fg=text_color, troughcolor=button_gray, activebackground=highlight_color, highlightthickness=0, bd=0, sliderrelief=tk.FLAT, sliderlength=int(15 * scaling_factor), width=int(15 * scaling_factor), font=scale_font(("Arial", 11, "bold")), command=update_fixed_frequency)
         frequency_scale.set(getattr(CONFIG, 'impulse_trigger_frequency', 10))
@@ -13052,11 +13056,11 @@ bg_color=panel_bg, widths=[8, 10])
                 ("nso_gamecube_controller", "NSO GameCube Controller:"))):
             row_pady = (0, int(10 * scaling_factor)) if grid_row < 2 else (0, 0)
             values = CONFIG.get_joystick_deadzone_settings(profile_name, category)[family]
-            tk.Label(content, text=title, bg=background_color, fg=text_color,
+            tk.Label(content, text=tr(title), bg=background_color, fg=text_color,
                      font=scale_font(("Arial", 11, "bold")), anchor=tk.E).grid(
                          row=grid_row, column=0, sticky=tk.E,
                          padx=(0, int(8 * scaling_factor)), pady=row_pady)
-            tk.Label(content, text="L Joystick:", bg=background_color, fg=text_color,
+            tk.Label(content, text=tr("L Joystick:"), bg=background_color, fg=text_color,
                      font=scale_font(("Arial", 11, "bold")), anchor=tk.E).grid(row=grid_row, column=1, sticky=tk.E)
             left_var, right_var = tk.IntVar(value=values["left"]), tk.IntVar(value=values["right"])
             rows[family] = {"left": left_var, "right": right_var}
@@ -13080,7 +13084,7 @@ bg_color=panel_bg, widths=[8, 10])
                                     highlightthickness=0, cursor="hand2", padx=0, pady=0)
             # grid's default placement is centered; sticky only accepts n/e/s/w.
             link_button.grid(row=grid_row, column=3, padx=int(8 * scaling_factor))
-            tk.Label(content, text="R Joystick:", bg=background_color, fg=text_color,
+            tk.Label(content, text=tr("R Joystick:"), bg=background_color, fg=text_color,
                      font=scale_font(("Arial", 11, "bold")), anchor=tk.E).grid(row=grid_row, column=4, sticky=tk.E)
             right = tk.Scale(
                 content, variable=right_var,
@@ -13115,7 +13119,7 @@ bg_color=panel_bg, widths=[8, 10])
 
         def row(label_text, pady_top=0):
             index = len(rows)
-            label = tk.Label(content, text=label_text, bg=background_color, fg=text_color,
+            label = tk.Label(content, text=tr(label_text), bg=background_color, fg=text_color,
                              font=scale_font(("Arial", 11, "bold")), anchor=tk.E)
             cell = tk.Frame(content, bg=background_color, width=control_width,
                             height=control_height)
@@ -13199,7 +13203,7 @@ bg_color=panel_bg, widths=[8, 10])
                 cell.grid(row=row_index, column=col_index, padx=(0, gap), pady=(0, gap), sticky="nsew")
                 cell.grid_propagate(False)
                 border = int(2 * scaling_factor) if selected_now else 0
-                btn = tk.Button(cell, text=back_button_label(token), font=font, bg=button_gray,
+                btn = tk.Button(cell, text=tr(back_button_label(token)), font=font, bg=button_gray,
                                 fg="white", relief=tk.FLAT, bd=0, highlightthickness=0,
                                 activebackground=highlight_color, activeforeground="white",
                                 command=lambda value=token: toggle_token(value))
@@ -13243,7 +13247,7 @@ bg_color=panel_bg, widths=[8, 10])
                                  if payload in MOUSE_CLICK_CUSTOM_TOKENS else "Custom")
                 else:
                     label = back_button_label(value)
-                button.config(text=f"{'Left' if side == 'left' else 'Right'} Joy-con: {label}")
+                button.config(text=tr(f"{'Left' if side == 'left' else 'Right'} Joy-con: {label}"))
 
     def open_joycon_ir_sensor_settings(self, side, anchor_widget, mapping_scope=None):
         if self._toggle_joystick_popup(anchor_widget):
@@ -13276,11 +13280,11 @@ bg_color=panel_bg, widths=[8, 10])
             return aliases.get(value, value)
 
         mode_var = tk.StringVar(value="Hold")
-        mode_btn = tk.Button(holder, text="Hold", bg=button_gray, fg="white",
+        mode_btn = tk.Button(holder, text=tr("Hold"), bg=button_gray, fg="white",
                              font=scale_font(("Arial", 9, "bold")), relief=tk.FLAT, bd=0, width=4)
         action_btn = tk.Button(holder, bg=button_gray, fg="white", font=control_font,
                                relief=tk.FLAT, bd=0)
-        close_btn = tk.Button(holder, text="X", bg="#ff4444", fg="white", font=control_font,
+        close_btn = tk.Button(holder, text=tr("X"), bg="#ff4444", fg="white", font=control_font,
                               relief=tk.FLAT, bd=0)
         record_entry = RecordingEntry(holder, normal_font=scale_font(("Arial", 11, "bold")),
                                       prefix_font=scale_font(("Arial", 8, "bold")), width=11,
@@ -13329,7 +13333,7 @@ bg_color=panel_bg, widths=[8, 10])
             old_mode, payload = custom_parts(value)
             new_mode = "Tap" if old_mode == "Hold" else "Hold"
             mode_var.set(new_mode)
-            mode_btn.config(text=new_mode)
+            mode_btn.config(text=tr(new_mode))
             set_function(f"Custom[{new_mode}]:{payload}")
 
         mode_btn.config(command=toggle_mode)
@@ -13338,7 +13342,7 @@ bg_color=panel_bg, widths=[8, 10])
             value = CONFIG.get_joycon_ir_sensor_settings_scoped(side, profile_name, category, mapping_scope).get("function", "Custom")
             mode, _payload = custom_parts(value if isinstance(value, str) else "Custom")
             mode_var.set(mode)
-            mode_btn.config(text=mode)
+            mode_btn.config(text=tr(mode))
             self.start_custom_recording(
                 "joycon_ir_sensor", record_entry, selector, holder, mode_var,
                 value_writer=lambda recorded: CONFIG.set_joycon_ir_sensor_setting_scoped(side, "function", recorded, profile_name, category, mapping_scope),
@@ -13381,26 +13385,26 @@ bg_color=panel_bg, widths=[8, 10])
             popup.update_idletasks()
             self._place_popup_within_root_bounds(popup, anchor_widget)
             if value == "Default":
-                action_btn.config(text="IR Mouse")
+                action_btn.config(text=tr("IR Mouse"))
                 action_btn.config(command=open_action_popup)
                 action_btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
                 close_btn.pack(side=tk.LEFT, fill=tk.Y, padx=(int(2 * scaling_factor), 0))
             elif value == "Change Profile":
-                action_btn.config(text="Change Profile")
+                action_btn.config(text=tr("Change Profile"))
                 action_btn.config(command=open_action_popup)
                 action_btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
                 close_btn.pack(side=tk.LEFT, fill=tk.Y, padx=(int(2 * scaling_factor), 0))
             elif isinstance(value, str) and value.startswith("Custom"):
                 mode, payload = custom_parts(value)
                 mode_var.set(mode)
-                mode_btn.config(text=mode)
+                mode_btn.config(text=tr(mode))
                 mode_btn.pack(side=tk.LEFT, fill=tk.Y, padx=(0, int(2 * scaling_factor)))
                 special_text = {IN_APP_GYRO_TOKEN: IN_APP_GYRO_LABEL,
                                 MODE_SHIFT_TOKEN: MODE_SHIFT_LABEL,
                                 GYRO_LOCK_TOKEN: GYRO_LOCK_LABEL}.get(payload)
                 mouse_token = MOUSE_CLICK_CUSTOM_TOKENS.get(payload)
                 if special_text or mouse_token:
-                    action_btn.config(text=special_text or back_button_label(mouse_token))
+                    action_btn.config(text=tr(special_text or back_button_label(mouse_token)))
                     if mouse_token:
                         action_btn._mouse_click_token = mouse_token
                         action_btn.config(command=lambda button=action_btn: self.open_back_button_popup(button))
@@ -13505,8 +13509,8 @@ bg_color=panel_bg, widths=[8, 10])
             def select_token(tokens, setting_key=key, button=btn):
                 CONFIG.set_joycon_ir_mouse_setting_scoped(side, setting_key, tokens, profile_name, category, mapping_scope)
                 CONFIG.save_config()
-                button.config(text=display_tokens(tokens))
-            btn.config(text=display_tokens(settings.get(key, [])),
+                button.config(text=tr(display_tokens(tokens)))
+            btn.config(text=tr(display_tokens(settings.get(key, []))),
                        command=lambda button=btn, setting_key=key: self._open_joycon_ir_switch_input_popup(
                            button,
                            CONFIG.get_joycon_ir_sensor_settings_scoped(side, profile_name, category, mapping_scope)["ir_mouse"].get(setting_key, []),
@@ -13563,7 +13567,7 @@ bg_color=panel_bg, widths=[8, 10])
                     break
         if not gc_controller:
             from tkinter import messagebox
-            messagebox.showinfo("Not Found", "No NSO GameCube Controller is currently connected.")
+            messagebox.showinfo(tr("Not Found"), tr("No NSO GameCube Controller is currently connected."))
             return
 
         GCTriggerCalibrationWizard(self.root, gc_controller)
@@ -13860,7 +13864,7 @@ bg_color=panel_bg, widths=[8, 10])
                         mouse_click_btn.pack_forget()
                     if mode_var and mode_btn:
                         mode_var.set("Hold")
-                        mode_btn.config(text="Hold")
+                        mode_btn.config(text=tr("Hold"))
                     cp_frame.pack(side=tk.LEFT)
                 else:
                     mouse_click_mapping = parse_mouse_click_mapping(current_val)
@@ -13873,9 +13877,9 @@ bg_color=panel_bg, widths=[8, 10])
                             in_app_gyro_btn.pack_forget()
                         close_btn.pack_forget()
                         mode_var.set(mode)
-                        mode_btn.config(text=mode)
+                        mode_btn.config(text=tr(mode))
                         mouse_click_btn._mouse_click_token = option_token
-                        mouse_click_btn.config(text=back_button_label(option_token))
+                        mouse_click_btn.config(text=tr(back_button_label(option_token)))
                         combo.set(option_token)
                         mouse_click_btn.pack(side=tk.LEFT, fill=tk.Y)
                         custom_frame.pack(side=tk.LEFT)
@@ -13892,15 +13896,15 @@ bg_color=panel_bg, widths=[8, 10])
 
                             if current_val.startswith("Custom[Tap]:"):
                                 mode_var.set("Tap")
-                                mode_btn.config(text="Tap")
+                                mode_btn.config(text=tr("Tap"))
                                 display_val = current_val[12:]
                             elif current_val.startswith("Custom[Hold]:"):
                                 mode_var.set("Hold")
-                                mode_btn.config(text="Hold")
+                                mode_btn.config(text=tr("Hold"))
                                 display_val = current_val[13:]
                             else:
                                 mode_var.set("Hold")
-                                mode_btn.config(text="Hold")
+                                mode_btn.config(text=tr("Hold"))
                                 display_val = current_val[7:]
 
                             if display_val != IN_APP_GYRO_TOKEN and not display_val.startswith(IN_APP_GYRO_TOKEN):
@@ -13942,7 +13946,7 @@ bg_color=panel_bg, widths=[8, 10])
                                     if mouse_click_btn:
                                         mouse_click_btn._mouse_click_token = "Default"
                                         mouse_click_btn.pack_forget()
-                                    in_app_gyro_btn.config(text=display_str)
+                                    in_app_gyro_btn.config(text=tr(display_str))
                                     in_app_gyro_btn.pack(side=tk.LEFT, fill=tk.Y, before=close_btn)
                             else:
                                 combo.set("Custom")
@@ -13970,7 +13974,7 @@ bg_color=panel_bg, widths=[8, 10])
                             mouse_click_btn.pack_forget()
                         if mode_var and mode_btn:
                             mode_var.set("Hold")
-                            mode_btn.config(text="Hold")
+                            mode_btn.config(text=tr("Hold"))
                         combo.pack(side=tk.LEFT)
 
         for mapping_scope in (None, "in_app_gyro_mode_mappings"):
@@ -13989,12 +13993,12 @@ bg_color=panel_bg, widths=[8, 10])
                     combo.set(current_val)
                     combo.pack_forget()
                     if custom_btn:
-                        custom_btn.config(text=current_val)
+                        custom_btn.config(text=tr(current_val))
                     if scroll_mode_btn:
                         if current_val == "Scroll Wheel":
                             if scroll_activation_var:
                                 scroll_activation_var.set(CONFIG.get_joystick_setting_scoped(key, "scroll_activation", "Hold", mapping_scope))
-                            scroll_mode_btn.config(text=CONFIG.get_joystick_setting_scoped(key, "scroll_activation", "Hold", mapping_scope))
+                            scroll_mode_btn.config(text=tr(CONFIG.get_joystick_setting_scoped(key, "scroll_activation", "Hold", mapping_scope)))
                             scroll_mode_btn.pack(side=tk.LEFT, padx=(0, int(2 * scaling_factor)), fill=tk.Y, before=custom_btn)
                         else:
                             scroll_mode_btn.pack_forget()
@@ -14235,7 +14239,7 @@ bg_color=panel_bg, widths=[8, 10])
         set_startup(val)
         CONFIG.save_config()
         if hasattr(self, 'startup_btn'):
-            self.startup_btn.config(text=f"Run At Startup: {'ON' if val else 'OFF'}")
+            self.startup_btn.config(text=tr(f"Run At Startup: {'ON' if val else 'OFF'}"))
         if hasattr(self, 'startup_frame'):
             self.startup_frame.config(bg=highlight_color if val else button_gray)
 
@@ -14264,7 +14268,7 @@ bg_color=panel_bg, widths=[8, 10])
             ),
         }
         dialog = tk.Toplevel(self.root)
-        dialog.title(f"Power Saving: {target}")
+        dialog.title(tr(f"Power Saving: {target}"))
         dialog.resizable(False, False)
         dialog.config(bg="#1E1E1E")
         dialog.transient(self.root)
@@ -14274,11 +14278,11 @@ bg_color=panel_bg, widths=[8, 10])
             dialog, int(540 * scaling_factor), int(dialog_height * scaling_factor))
         result = {"proceed": False}
         suppress_var = tk.BooleanVar(value=False)
-        tk.Label(dialog, text=messages[target], fg="white", bg="#1E1E1E",
+        tk.Label(dialog, text=tr(messages[target]), fg="white", bg="#1E1E1E",
                  font=scale_font(("Arial", 11, "bold")), justify=tk.CENTER,
                  wraplength=int(480 * scaling_factor)).pack(
                      padx=int(24 * scaling_factor), pady=(int(24 * scaling_factor), int(12 * scaling_factor)))
-        tk.Checkbutton(dialog, text="Do not show again.", variable=suppress_var,
+        tk.Checkbutton(dialog, text=tr("Do not show again."), variable=suppress_var,
                        bg="#1E1E1E", fg="white", activebackground="#1E1E1E",
                        activeforeground="white", selectcolor=button_gray,
                        font=scale_font(("Arial", 10))).pack(pady=(0, int(12 * scaling_factor)))
@@ -14290,7 +14294,7 @@ bg_color=panel_bg, widths=[8, 10])
                 setattr(CONFIG, f"power_saving_{target.lower()}_warning_suppressed", True)
             dialog.destroy()
         for text, proceed in (("Proceed", True), ("Cancel", False)):
-            tk.Button(buttons, text=text, bg=button_gray, fg=text_color,
+            tk.Button(buttons, text=tr(text), bg=button_gray, fg=text_color,
                       bd=0, relief=tk.FLAT, width=9,
                       font=scale_font(("Arial", 10, "bold")),
                       command=lambda value=proceed: close(value)).pack(
@@ -14322,7 +14326,7 @@ bg_color=panel_bg, widths=[8, 10])
                 if callable(apply_mode):
                     apply_mode(previous_mode, target)
         if hasattr(self, "power_saving_btn"):
-            self.power_saving_btn.config(text=f"Power Saving: {target}")
+            self.power_saving_btn.config(text=tr(f"Power Saving: {target}"))
 
     def _apply_power_saving_ui_priority(self, mode):
         # Prioritize only Tk's main thread while it is runnable. Thread priority
@@ -14336,7 +14340,7 @@ bg_color=panel_bg, widths=[8, 10])
         CONFIG.start_minimized = val
         CONFIG.save_config()
         if hasattr(self, 'minimized_btn'):
-            self.minimized_btn.config(text=f"Start Minimized: {'ON' if val else 'OFF'}")
+            self.minimized_btn.config(text=tr(f"Start Minimized: {'ON' if val else 'OFF'}"))
         if hasattr(self, 'min_frame'):
             self.min_frame.config(bg=highlight_color if val else button_gray)
 
@@ -14447,13 +14451,13 @@ bg_color=panel_bg, widths=[8, 10])
 
         def refresh_hidhide_button():
             installed = self._sync_hidhide_installed()
-            hidhide_btn.config(text="HidHide" if installed else "Install HidHide")
+            hidhide_btn.config(text=tr("HidHide" if installed else "Install HidHide"))
 
         hidhide_frame = tk.Frame(popup, bg=button_gray)
         hidhide_frame.pack(fill=tk.X)
         hidhide_btn = tk.Button(
             hidhide_frame,
-            text="HidHide" if hidhide_service_state() is True else "Install HidHide",
+            text=tr("HidHide" if hidhide_service_state() is True else "Install HidHide"),
             bg=button_gray,
             fg=text_color,
             bd=0,
@@ -14471,7 +14475,7 @@ bg_color=panel_bg, widths=[8, 10])
             return bool(getattr(CONFIG, "wired_auto_scan_enabled", getattr(CONFIG, "wired_usb_enabled", True)))
 
         def refresh_auto_scan_button():
-            auto_scan_btn.config(text=f"Auto Scan: {'On' if auto_scan_enabled() else 'Off'}")
+            auto_scan_btn.config(text=tr(f"Auto Scan: {'On' if auto_scan_enabled() else 'Off'}"))
 
         def toggle_auto_scan():
             val = not auto_scan_enabled()
@@ -14483,7 +14487,7 @@ bg_color=panel_bg, widths=[8, 10])
 
         auto_scan_btn = tk.Button(
             auto_scan_frame,
-            text="",
+            text=tr(""),
             bg=button_gray,
             fg=text_color,
             bd=0,
@@ -14502,7 +14506,7 @@ bg_color=panel_bg, widths=[8, 10])
 
         tk.Button(
             manual_frame,
-            text="Manual Scan",
+            text=tr("Manual Scan"),
             bg=button_gray,
             fg=text_color,
             bd=0,
@@ -14551,7 +14555,7 @@ bg_color=panel_bg, widths=[8, 10])
         dialog_w = int(520 * scaling_factor)
         dialog_h = int(260 * scaling_factor)
         dialog = tk.Toplevel(self.root)
-        dialog.title("Install HidHide")
+        dialog.title(tr("Install HidHide"))
         dialog.resizable(False, False)
         dialog.config(bg="#1E1E1E")
         dialog.transient(self.root)
@@ -14564,10 +14568,10 @@ bg_color=panel_bg, widths=[8, 10])
         tk.Label(
             dialog,
             text=(
-                f"{self.wired_controller_label(sentence=True)} detected.\n\n"
+                tr(f"{self.wired_controller_label(sentence=True)} detected.\n\n"
                 "HidHide hides the controller's physical HID so games only see "
                 "the virtual controller (no double input).\n\n"
-                "Install it now?\n(Requires administrator privileges.)"
+                "Install it now?\n(Requires administrator privileges.)")
             ),
             fg="white",
             bg="#1E1E1E",
@@ -14578,7 +14582,7 @@ bg_color=panel_bg, widths=[8, 10])
 
         tk.Checkbutton(
             dialog,
-            text="Do not show again",
+            text=tr("Do not show again"),
             variable=suppress_var,
             bg="#1E1E1E",
             fg="white",
@@ -14607,7 +14611,7 @@ bg_color=panel_bg, widths=[8, 10])
             frame.pack(side=tk.LEFT, padx=int(6 * scaling_factor))
             tk.Button(
                 frame,
-                text=text,
+                text=tr(text),
                 bg=button_gray,
                 fg=text_color,
                 bd=0,
@@ -14650,7 +14654,7 @@ bg_color=panel_bg, widths=[8, 10])
         dialog_w = int(460 * scaling_factor)
         dialog_h = int(210 * scaling_factor)
         dialog = tk.Toplevel(self.root)
-        dialog.title("HidHide")
+        dialog.title(tr("HidHide"))
         dialog.resizable(False, False)
         dialog.config(bg="#1E1E1E")
         dialog.transient(self.root)
@@ -14658,7 +14662,7 @@ bg_color=panel_bg, widths=[8, 10])
         self.center_window_on_root(dialog, dialog_w, dialog_h)
 
         info_label = tk.Label(
-            dialog, text="", fg="white", bg="#1E1E1E",
+            dialog, text=tr(""), fg="white", bg="#1E1E1E",
             font=scale_font(("Arial", 11, "bold")), justify=tk.LEFT,
         )
         info_label.pack(pady=(int(16 * scaling_factor), int(10 * scaling_factor)), padx=int(16 * scaling_factor), anchor=tk.W)
@@ -14673,19 +14677,19 @@ bg_color=panel_bg, widths=[8, 10])
             nonlocal hidhide_active
             info_label.config(
                 text=(
-                    "HidHide (hides the physical controller from games)\n"
+                    tr("HidHide (hides the physical controller from games)\n"
                     f"Status: Installed\n"
-                    f"Filtering: {'Enabled' if hidhide_active else 'Disabled'}"
+                    f"Filtering: {'Enabled' if hidhide_active else 'Disabled'}")
                 )
             )
             if "active" in buttons and buttons["active"].winfo_exists():
                 # While a toggle is being applied/verified the button stays locked so
                 # rapid re-clicks can't start a competing write.
                 if getattr(self, "_hidhide_toggle_in_progress", False):
-                    buttons["active"].config(text="Applying...", state=tk.DISABLED)
+                    buttons["active"].config(text=tr("Applying..."), state=tk.DISABLED)
                 else:
                     buttons["active"].config(
-                        text=("Disable HidHide" if hidhide_active else "Enable HidHide"),
+                        text=(tr("Disable HidHide" if hidhide_active else "Enable HidHide")),
                         state=tk.NORMAL
                     )
 
@@ -14712,7 +14716,7 @@ bg_color=panel_bg, widths=[8, 10])
             if not ("active" in buttons and buttons["active"].winfo_exists()):
                 return
             self._hidhide_toggle_in_progress = True
-            buttons["active"].config(state=tk.DISABLED, text="Applying...")
+            buttons["active"].config(state=tk.DISABLED, text=tr("Applying..."))
             dialog.update_idletasks()
 
             def unlock_and_refresh():
@@ -14785,7 +14789,7 @@ bg_color=panel_bg, widths=[8, 10])
             frame = tk.Frame(sel_frame, bg=button_gray)
             frame.pack(side=tk.LEFT, padx=int(4 * scaling_factor))
             btn = tk.Button(
-                frame, text=("Uninstall HidHide" if key == "uninstall" else ""),
+                frame, text=(tr("Uninstall HidHide" if key == "uninstall" else "")),
                 bg=button_gray, fg=text_color, bd=0, relief=tk.FLAT,
                 font=scale_font(("Arial", 10, "bold")), width=15, command=command,
             )
@@ -14795,7 +14799,7 @@ bg_color=panel_bg, widths=[8, 10])
         close_btn_frame = tk.Frame(dialog, bg=button_gray)
         close_btn_frame.pack(pady=int(10 * scaling_factor))
         tk.Button(
-            close_btn_frame, text="Close", bg=button_gray, fg=text_color,
+            close_btn_frame, text=tr("Close"), bg=button_gray, fg=text_color,
             bd=0, relief=tk.FLAT, font=scale_font(("Arial", 10, "bold")), width=8,
             command=dialog.destroy,
         ).pack(padx=int(2 * scaling_factor), pady=int(2 * scaling_factor))
@@ -14834,13 +14838,13 @@ bg_color=panel_bg, widths=[8, 10])
         exit_code = [None]
         try:
             progress_win = tk.Toplevel(self.root)
-            progress_win.title("HidHide")
+            progress_win.title(tr("HidHide"))
             progress_win.resizable(False, False)
             progress_win.config(bg="#1E1E1E")
             progress_win.transient(self.root)
             progress_win.grab_set()
             self.center_window_on_root(progress_win, int(450 * scaling_factor), int(130 * scaling_factor))
-            tk.Label(progress_win, text=wait_text, fg="white", bg="#1E1E1E",
+            tk.Label(progress_win, text=tr(wait_text), fg="white", bg="#1E1E1E",
                      font=scale_font(("Arial", 11, "bold"))).pack(pady=int(40 * scaling_factor))
 
             hProcess = self._launch_elevated(
@@ -14949,7 +14953,7 @@ bg_color=panel_bg, widths=[8, 10])
 
     def custom_askstring(self, title, prompt, initialvalue=""):
         dialog = tk.Toplevel(self.root)
-        dialog.title(title)
+        dialog.title(tr(title))
         dialog.configure(bg=background_color)
         dialog.transient(self.root)
         dialog.grab_set()
@@ -14960,7 +14964,7 @@ bg_color=panel_bg, widths=[8, 10])
         y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (h // 2)
         dialog.geometry(f"{w}x{h}+{x}+{y}")
         
-        tk.Label(dialog, text=prompt, font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color).pack(pady=(int(15*scaling_factor), int(5*scaling_factor)))
+        tk.Label(dialog, text=tr(prompt), font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color).pack(pady=(int(15*scaling_factor), int(5*scaling_factor)))
         
         entry = tk.Entry(dialog, font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", insertbackground="white", justify="center")
         entry.pack(padx=int(20*scaling_factor), fill=tk.X)
@@ -14980,8 +14984,8 @@ bg_color=panel_bg, widths=[8, 10])
         
         btn_frame = tk.Frame(dialog, bg=background_color)
         btn_frame.pack(pady=int(15*scaling_factor))
-        tk.Button(btn_frame, text="OK", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=on_ok).pack(side=tk.LEFT, padx=5)
-        tk.Button(btn_frame, text="Cancel", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=on_cancel).pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text=tr("OK"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=on_ok).pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text=tr("Cancel"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=on_cancel).pack(side=tk.LEFT, padx=5)
         
         entry.focus_set()
         self.root.wait_window(dialog)
@@ -14989,7 +14993,7 @@ bg_color=panel_bg, widths=[8, 10])
 
     def custom_messagebox(self, title, message, type="info", confirm_text="Yes", cancel_text="No"):
         dialog = tk.Toplevel(self.root)
-        dialog.title(title)
+        dialog.title(tr(title))
         dialog.configure(bg=background_color)
         dialog.transient(self.root)
         dialog.grab_set()
@@ -15000,7 +15004,7 @@ bg_color=panel_bg, widths=[8, 10])
         y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (h // 2)
         dialog.geometry(f"{w}x{h}+{x}+{y}")
         
-        tk.Label(dialog, text=message, font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, wraplength=int(310*scaling_factor), justify="center").pack(pady=(int(20*scaling_factor), int(10*scaling_factor)), expand=True)
+        tk.Label(dialog, text=tr(message), font=scale_font(("Arial", 11, "bold")), bg=background_color, fg=text_color, wraplength=int(310*scaling_factor), justify="center").pack(pady=(int(20*scaling_factor), int(10*scaling_factor)), expand=True)
         
         result = [None]
         btn_frame = tk.Frame(dialog, bg=background_color)
@@ -15011,10 +15015,10 @@ bg_color=panel_bg, widths=[8, 10])
             dialog.destroy()
             
         if type == "yesno":
-            tk.Button(btn_frame, text=confirm_text, font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=lambda: set_res(True)).pack(side=tk.LEFT, padx=5)
-            tk.Button(btn_frame, text=cancel_text, font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=lambda: set_res(False)).pack(side=tk.LEFT, padx=5)
+            tk.Button(btn_frame, text=tr(confirm_text), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=lambda: set_res(True)).pack(side=tk.LEFT, padx=5)
+            tk.Button(btn_frame, text=tr(cancel_text), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=lambda: set_res(False)).pack(side=tk.LEFT, padx=5)
         else:
-            tk.Button(btn_frame, text="OK", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=lambda: set_res(True)).pack()
+            tk.Button(btn_frame, text=tr("OK"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", width=8, relief=tk.FLAT, bd=0, command=lambda: set_res(True)).pack()
             
         dialog.bind("<Return>", lambda e: set_res(True))
         if type == "yesno":
@@ -15091,7 +15095,7 @@ bg_color=panel_bg, widths=[8, 10])
 
         btn = tk.Button(
             self.assigned_apps_frame,
-            text="Assign Current Profile To Apps",
+            text=tr("Assign Current Profile To Apps"),
             font=scale_font(("Arial", 11, "bold")),
             bg=button_gray,
             fg="white",
@@ -15109,7 +15113,7 @@ bg_color=panel_bg, widths=[8, 10])
 
         tk.Label(
             self.profile_switch_trigger_frame,
-            text="Profile Switching Combo Trigger:",
+            text=tr("Profile Switching Combo Trigger:"),
             bg=background_color,
             fg=text_color,
             font=scale_font(("Arial", 11, "bold"))
@@ -15136,7 +15140,7 @@ bg_color=panel_bg, widths=[8, 10])
                            else "Win32 API")
             self.profile_keyboard_output_btn = tk.Button(
                 self.profile_switch_trigger_frame,
-                text=f"Keyboard: {keyboard_label}",
+                text=tr(f"Keyboard: {keyboard_label}"),
                 font=scale_font(("Arial", 10, "bold")), bg=button_gray, fg="white",
                 relief=tk.FLAT, bd=0, command=self.toggle_winuhid_keyboard_output,
             )
@@ -15144,7 +15148,7 @@ bg_color=panel_bg, widths=[8, 10])
                 side=tk.LEFT, padx=(int(12 * scaling_factor), int(2 * scaling_factor)))
             self.profile_mouse_output_btn = tk.Button(
                 self.profile_switch_trigger_frame,
-                text=f"Mouse: {mouse_label}",
+                text=tr(f"Mouse: {mouse_label}"),
                 font=scale_font(("Arial", 10, "bold")), bg=button_gray, fg="white",
                 relief=tk.FLAT, bd=0, command=self.toggle_winuhid_mouse_output,
             )
@@ -15156,7 +15160,7 @@ bg_color=panel_bg, widths=[8, 10])
 
     def open_assigned_apps_popup(self):
         popup = tk.Toplevel(self.root)
-        popup.title("Assigned Apps")
+        popup.title(tr("Assigned Apps"))
         popup.configure(bg=background_color)
         
         w, h = int(400 * scaling_factor), int(300 * scaling_factor)
@@ -15242,10 +15246,10 @@ bg_color=panel_bg, widths=[8, 10])
                 row = tk.Frame(scrollable_frame, bg=background_color)
                 row.pack(fill=tk.X, pady=int(2 * scaling_factor))
                 
-                del_btn = tk.Button(row, text="X", bg="#cc0000", fg="white", font=scale_font(("Arial", 9, "bold")), relief=tk.FLAT, bd=0, command=lambda i=index: [self.on_remove_assigned_app(i), populate_list()])
+                del_btn = tk.Button(row, text=tr("X"), bg="#cc0000", fg="white", font=scale_font(("Arial", 9, "bold")), relief=tk.FLAT, bd=0, command=lambda i=index: [self.on_remove_assigned_app(i), populate_list()])
                 del_btn.pack(side=tk.RIGHT, fill=tk.Y, padx=0)
                 
-                lbl = tk.Label(row, text=app_name, bg=button_gray, fg="white", font=scale_font(("Arial", 11, "bold")), justify="center", anchor="center", padx=int(5*scaling_factor), pady=int(4*scaling_factor))
+                lbl = tk.Label(row, text=tr(app_name), bg=button_gray, fg="white", font=scale_font(("Arial", 11, "bold")), justify="center", anchor="center", padx=int(5*scaling_factor), pady=int(4*scaling_factor))
                 lbl.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, int(2*scaling_factor)))
 
             bind_mousewheel(popup)
@@ -15258,10 +15262,10 @@ bg_color=panel_bg, widths=[8, 10])
             populate_list()
             popup.grab_set()
 
-        add_btn = tk.Button(btn_frame, text="Add", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=add_and_refresh)
+        add_btn = tk.Button(btn_frame, text=tr("Add"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=add_and_refresh)
         add_btn.pack(side=tk.LEFT, padx=int(10 * scaling_factor), expand=True, fill=tk.X)
 
-        close_btn = tk.Button(btn_frame, text="Close", font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=popup.destroy)
+        close_btn = tk.Button(btn_frame, text=tr("Close"), font=scale_font(("Arial", 11, "bold")), bg=button_gray, fg="white", relief=tk.FLAT, bd=0, command=popup.destroy)
         close_btn.pack(side=tk.RIGHT, padx=int(10 * scaling_factor), expand=True, fill=tk.X)
 
     def choose_app_path(self):
@@ -15270,7 +15274,7 @@ bg_color=panel_bg, widths=[8, 10])
         try:
             return filedialog.askopenfilename(
                 parent=self.root,
-                title="Choose App",
+                title=tr("Choose App"),
                 initialdir=initial_dir,
                 filetypes=[("Applications", "*.exe"), ("All files", "*.*")],
             )
@@ -15760,7 +15764,7 @@ bg_color=panel_bg, widths=[8, 10])
         try:
             file_path = filedialog.askopenfilename(
                 parent=self.root,
-                title="Choose a .yaml File",
+                title=tr("Choose a .yaml File"),
                 filetypes=[("YAML files", "*.yaml")],
             )
         finally:
@@ -15881,7 +15885,7 @@ bg_color=panel_bg, widths=[8, 10])
         try:
             file_path = filedialog.asksaveasfilename(
                 parent=self.root,
-                title="Choose Export Location",
+                title=tr("Choose Export Location"),
                 defaultextension=".yaml",
                 filetypes=[("YAML files", "*.yaml")],
                 initialfile="switch2_profiles.yaml" if selected else "switch2_controller_data.yaml",
@@ -16187,9 +16191,9 @@ bg_color=panel_bg, widths=[8, 10])
             if self.players_info is not None:
                 for p in self.players_info: p.main_frame.destroy()
                 self.players_info = None
-            if not any(isinstance(w, tk.Label) and w.cget("text").startswith("Press button") for w in self.main_frame.winfo_children()):
+            if not any(isinstance(w, tk.Label) and w.cget("text") == tr("Press button of a paired controller, or hold sync button to pair") for w in self.main_frame.winfo_children()):
                 for w in self.main_frame.winfo_children(): w.destroy()
-                tk.Label(self.main_frame, text="Press button of a paired controller, or hold sync button to pair", font=self.font, bg=background_color, fg=text_color).pack()
+                tk.Label(self.main_frame, text=tr("Press button of a paired controller, or hold sync button to pair"), font=self.font, bg=background_color, fg=text_color).pack()
                 tk.Label(self.main_frame, image=self.pairing_hint_image, bg=background_color).pack(pady=10)
 
     def hide_to_tray(self):
@@ -16212,7 +16216,7 @@ bg_color=panel_bg, widths=[8, 10])
         except:
             img = Image.new('RGB', (64, 64), color=(0, 195, 227)) # Cyan fallback
         
-        menu = (item('Show', self.show_window, default=True), item('Exit', lambda: self.root.after(0, self.on_quit)))
+        menu = (item(tr('Show'), self.show_window, default=True), item(tr('Exit'), lambda: self.root.after(0, self.on_quit)))
         self.tray_icon = pystray.Icon("Switch2Connect", img, "Switch 2 Connect", menu, action=self.show_window)
         self.tray_icon.run_detached()
 
